@@ -1,0 +1,1801 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  <meta name="apple-mobile-web-app-title" content="高数战报" />
+  <meta name="theme-color" content="#0f172a" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'%3E%3Crect width='128' height='128' rx='28' fill='%231e3a8a'/%3E%3Ctext x='64' y='78' text-anchor='middle' font-size='56' font-weight='bold' fill='%23fbbf24' font-family='sans-serif'%3E%E2%88%AB%3C/text%3E%3C/svg%3E" />
+  <title>28考研数学一 · 高数四轮规划与每日战报系统</title>
+  <style>
+    :root {
+      --bg: #f4f7fb;
+      --surface: #ffffff;
+      --surface-alt: #f0f4fa;
+      --text: #182230;
+      --muted: #5c6b7f;
+      --border: #dfe6f0;
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --primary-soft: #e8f0fe;
+      --green: #059669;
+      --green-soft: #dcfce7;
+      --amber: #d97706;
+      --amber-soft: #fef3c7;
+      --gold: #f59e0b;
+      --red: #dc2626;
+      --red-soft: #fee2e2;
+      --purple: #7c3aed;
+      --purple-soft: #f3e8ff;
+      --shadow: 0 2px 12px rgba(15, 23, 42, 0.06);
+      --radius: 12px;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.55;
+      font-size: 14px;
+    }
+
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 20px 18px 64px;
+    }
+
+    /* Hero Banner */
+    .hero {
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 55%, #2563eb 100%);
+      color: #fff;
+      border-radius: 16px;
+      padding: 24px 26px;
+      box-shadow: 0 8px 24px rgba(30, 58, 138, 0.18);
+      margin-bottom: 18px;
+    }
+    .hero-top {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 14px;
+    }
+    .hero h1 {
+      margin: 0 0 4px;
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: 0.2px;
+    }
+    .hero-sub {
+      margin: 0;
+      opacity: 0.88;
+      font-size: 13px;
+    }
+    .hero-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .hero-btn {
+      background: rgba(255, 255, 255, 0.14);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      padding: 6px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      transition: background 0.15s;
+    }
+    .hero-btn:hover { background: rgba(255, 255, 255, 0.24); }
+
+    /* Level & XP Strip */
+    .level-strip {
+      margin-top: 16px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 12px;
+      padding: 12px 16px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 16px;
+    }
+    .level-badge {
+      background: linear-gradient(135deg, #f59e0b, #fbbf24);
+      color: #451a03;
+      font-weight: 800;
+      font-size: 13px;
+      padding: 5px 12px;
+      border-radius: 999px;
+      white-space: nowrap;
+      box-shadow: 0 2px 8px rgba(245, 158, 11, 0.35);
+    }
+    .xp-wrap { flex: 1; min-width: 220px; }
+    .xp-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      margin-bottom: 5px;
+      opacity: 0.92;
+    }
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #34d399, #fbbf24);
+      width: 0%;
+      transition: width 0.35s ease;
+    }
+
+    /* KPI Grid */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .kpi-card {
+      background: rgba(255, 255, 255, 0.11);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 10px;
+      padding: 11px 14px;
+    }
+    .kpi-label { font-size: 12px; opacity: 0.82; }
+    .kpi-value { font-size: 20px; font-weight: 800; margin: 2px 0; }
+    .kpi-foot { font-size: 11px; opacity: 0.8; }
+
+    /* Tabs */
+    .nav-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      background: var(--bg);
+      padding: 8px 0;
+    }
+    .tab-btn {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--muted);
+      padding: 8px 14px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.15s ease;
+    }
+    .tab-btn:hover { border-color: var(--primary); color: var(--primary); }
+    .tab-btn.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    .section { display: none; }
+    .section.active { display: block; }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      box-shadow: var(--shadow);
+      margin-bottom: 16px;
+    }
+    .card h2 {
+      margin: 0 0 12px;
+      font-size: 16px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .card h3 { margin: 14px 0 8px; font-size: 14px; }
+
+    /* Daily Logger Form */
+    .logger-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(165px, 1fr));
+      gap: 12px;
+      align-items: end;
+    }
+    .field label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 5px;
+    }
+    .field input, .field select {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 13px;
+      background: #fff;
+      color: var(--text);
+      outline: none;
+    }
+    .field input:focus, .field select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+    .quota-banner {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 14px;
+      margin-bottom: 14px;
+      font-size: 13px;
+    }
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      padding: 9px 18px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-amber {
+      background: var(--amber-soft);
+      color: #92400e;
+      border: 1px solid #fcd34d;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .btn-amber:hover { background: #fde68a; }
+    .btn-outline {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      color: var(--text);
+    }
+    .btn-outline:hover { background: var(--surface-alt); }
+
+    /* Toast Feedback */
+    #toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 999;
+      background: #0f172a;
+      color: #fff;
+      padding: 14px 18px;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+      max-width: 360px;
+      display: none;
+      font-size: 13px;
+      border-left: 5px solid #34d399;
+    }
+
+    /* Heatmap */
+    .heatmap-outer {
+      overflow-x: auto;
+      padding-bottom: 6px;
+    }
+    .heatmap-months {
+      display: flex;
+      gap: 3px;
+      margin-left: 26px;
+      margin-bottom: 4px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .heatmap-body {
+      display: flex;
+      gap: 6px;
+      align-items: flex-start;
+    }
+    .heatmap-days-label {
+      display: grid;
+      grid-template-rows: repeat(7, 13px);
+      gap: 3px;
+      font-size: 10px;
+      color: var(--muted);
+      line-height: 13px;
+      width: 20px;
+      flex-shrink: 0;
+    }
+    .heatmap-grid {
+      display: grid;
+      grid-auto-flow: column;
+      grid-template-rows: repeat(7, 13px);
+      gap: 3px;
+    }
+    .hm-cell {
+      width: 13px;
+      height: 13px;
+      border-radius: 3px;
+      background: #e5eaf2;
+      cursor: pointer;
+      transition: transform 0.1s;
+    }
+    .hm-cell:hover { transform: scale(1.25); outline: 1px solid #0f172a; }
+    .hm-cell.t-base { background: #86efac; }
+    .hm-cell.t-should { background: #10b981; }
+    .hm-cell.t-over { background: #f59e0b; box-shadow: 0 0 4px rgba(245, 158, 11, 0.55); }
+    .hm-cell.t-shield { background: #93c5fd; }
+    .hm-cell.is-today { outline: 2px solid #2563eb; }
+    .hm-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 10px;
+    }
+    .hm-dot {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+      vertical-align: middle;
+      margin-right: 4px;
+    }
+
+    /* Chapter Map */
+    .chapter-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(215px, 1fr));
+      gap: 10px;
+    }
+    .ch-card {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 11px 13px;
+      background: #fff;
+      transition: border-color 0.2s;
+    }
+    .ch-card.cleared {
+      background: #ecfdf5;
+      border-color: #6ee7b7;
+    }
+    .ch-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 700;
+      font-size: 13px;
+      margin-bottom: 6px;
+    }
+    .ch-bar {
+      height: 7px;
+      background: #e5eaf2;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 5px;
+    }
+    .ch-fill {
+      height: 100%;
+      background: var(--primary);
+      transition: width 0.3s ease;
+    }
+    .ch-card.cleared .ch-fill { background: var(--green); }
+    .ch-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    /* Badges Wall */
+    .badge-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(185px, 1fr));
+      gap: 10px;
+    }
+    .ach-card {
+      border: 1px dashed var(--border);
+      border-radius: 10px;
+      padding: 11px 12px;
+      background: #fafbfd;
+      opacity: 0.58;
+      filter: grayscale(0.7);
+      transition: all 0.2s;
+    }
+    .ach-card.unlocked {
+      border: 1px solid #fcd34d;
+      background: linear-gradient(135deg, #fffbeb 0%, #ffffff 100%);
+      opacity: 1;
+      filter: none;
+      box-shadow: 0 2px 10px rgba(245, 158, 11, 0.12);
+    }
+    .ach-icon { font-size: 20px; margin-bottom: 4px; }
+    .ach-title { font-weight: 700; font-size: 13px; }
+    .ach-desc { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    /* Tables & Tags */
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 700px;
+      font-size: 13px;
+    }
+    th, td {
+      padding: 9px 11px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      vertical-align: top;
+    }
+    th { background: var(--surface-alt); font-weight: 700; white-space: nowrap; }
+    tr:last-child td { border-bottom: none; }
+    tr.done-row { background: #f0fdf4; color: #4b5563; }
+    tr.done-row td:nth-child(4) { text-decoration: line-through; opacity: 0.72; }
+
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .tag-blue { background: var(--primary-soft); color: var(--primary); }
+    .tag-amber { background: var(--amber-soft); color: #b45309; }
+    .tag-green { background: var(--green-soft); color: var(--green); }
+    .tag-purple { background: var(--purple-soft); color: var(--purple); }
+    .tag-red { background: var(--red-soft); color: var(--red); }
+
+    .callout {
+      border-left: 4px solid var(--primary);
+      background: var(--primary-soft);
+      padding: 12px 14px;
+      border-radius: 0 8px 8px 0;
+      margin: 10px 0;
+      font-size: 13px;
+    }
+    .callout.warn { border-left-color: var(--amber); background: var(--amber-soft); }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+      gap: 14px;
+    }
+    ul.clean { margin: 6px 0; padding-left: 18px; }
+    ul.clean li { margin-bottom: 4px; }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .filter-group { display: flex; flex-wrap: wrap; gap: 6px; }
+    .filter-btn {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      padding: 5px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .filter-btn.active { background: var(--text); color: #fff; border-color: var(--text); }
+    input[type="checkbox"].week-check { width: 17px; height: 17px; cursor: pointer; accent-color: var(--green); }
+
+    /* iPhone / Mobile Standalone Web App Optimization */
+    body {
+      -webkit-tap-highlight-color: transparent;
+      -webkit-text-size-adjust: 100%;
+    }
+    .container {
+      padding-top: calc(18px + env(safe-area-inset-top));
+      padding-bottom: calc(56px + env(safe-area-inset-bottom));
+      padding-left: calc(16px + env(safe-area-inset-left));
+      padding-right: calc(16px + env(safe-area-inset-right));
+    }
+    @media (max-width: 640px) {
+      .hero { padding: 18px 16px; border-radius: 14px; }
+      .hero h1 { font-size: 18px; }
+      .hero-sub { font-size: 12px; }
+      .kpi-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+      .kpi-card { padding: 10px 11px; }
+      .kpi-value { font-size: 17px; }
+      .nav-tabs {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        padding: 8px 2px;
+        top: 0;
+      }
+      .nav-tabs::-webkit-scrollbar { display: none; }
+      .tab-btn { flex-shrink: 0; padding: 8px 13px; font-size: 13px; }
+      .card { padding: 14px 14px; }
+      .logger-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+      .logger-grid .field-full { grid-column: 1 / -1; }
+      .grid-2 { grid-template-columns: 1fr; }
+      .chapter-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+      .ch-card { padding: 9px 10px; }
+      .ch-head { font-size: 12px; }
+      .badge-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+      /* Prevent iOS Safari auto-zoom on input focus (>=16px) */
+      .field input, .field select {
+        font-size: 16px;
+        min-height: 44px;
+        padding: 9px 11px;
+      }
+      .btn-primary, .btn-amber { min-height: 44px; font-size: 14px; }
+      #toast {
+        left: 14px;
+        right: 14px;
+        top: calc(14px + env(safe-area-inset-top));
+        max-width: none;
+      }
+      table { font-size: 12px; }
+      th, td { padding: 8px 8px; }
+    }
+
+    @media print {
+      .nav-tabs, .toolbar, .hero-actions, #logger-card, #toast { display: none !important; }
+      .section { display: block !important; }
+      body { background: #fff; }
+      .card { box-shadow: none; }
+    }
+  </style>
+</head>
+<body>
+  <div id="toast"></div>
+
+  <div class="container">
+    <!-- Hero & Live Stats -->
+    <div class="hero">
+      <div class="hero-top">
+        <div>
+          <h1>28 考研数学一 · 高数四轮规划与每日战报系统</h1>
+          <p class="hero-sub">复旦大学（学硕）· 408 专业课 · 数学一目标 140+ · 《2026 接力题典 1800·数一》高数基础篇（845 题，初始已完 84 题）</p>
+        </div>
+        <div class="hero-actions">
+          <button class="hero-btn" onclick="exportBackup()">导出 JSON 备份</button>
+          <button class="hero-btn" onclick="document.getElementById('import-file').click()">导入备份</button>
+          <input type="file" id="import-file" accept=".json" style="display:none" onchange="importBackup(event)" />
+          <button class="hero-btn" onclick="window.print()">打印 / 导出 PDF</button>
+        </div>
+      </div>
+
+      <!-- Level & XP -->
+      <div class="level-strip">
+        <div class="level-badge" id="ui-level">Lv.1 极限入门</div>
+        <div class="xp-wrap">
+          <div class="xp-meta">
+            <span id="ui-xp-text">当前经验：840 XP</span>
+            <span id="ui-xp-next">距离下一级还差 160 XP（新题+10 / 错题重算+15 / 超额+20）</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" id="ui-xp-bar"></div></div>
+        </div>
+      </div>
+
+      <!-- KPIs -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-label">基础篇剩余倒计时（845 题）</div>
+          <div class="kpi-value" id="kpi-r1-rem">还剩 761 题</div>
+          <div class="kpi-foot" id="kpi-r1-pct">已完成 84 / 845（9.9%）</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">当前连胜 / 最长连胜</div>
+          <div class="kpi-value" id="kpi-streak">0 天</div>
+          <div class="kpi-foot" id="kpi-max-streak">历史最长：0 天</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">超额余量银行（防崩盘垫）</div>
+          <div class="kpi-value" id="kpi-buffer">0 题</div>
+          <div class="kpi-foot">超额题自动存入，急事可抵扣保签</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">累计消灭错题 / 专注时长</div>
+          <div class="kpi-value" id="kpi-wrong-hours">0 题 / 0.0h</div>
+          <div class="kpi-foot" id="kpi-total-q">累计全轮刷题：84 题</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav-tabs">
+      <button class="tab-btn active" onclick="switchTab('dashboard', this)">🔥 每日战报 &amp; 成就看板</button>
+      <button class="tab-btn" onclick="switchTab('quotas', this)">1. 每日三档题量 &amp; 四轮总览</button>
+      <button class="tab-btn" onclick="switchTab('weekly', this)">2. 逐周清单 (W1–W56.5)</button>
+      <button class="tab-btn" onclick="switchTab('schedule', this)">3. 每周固定时间表</button>
+      <button class="tab-btn" onclick="switchTab('risks', this)">4. 风险与四级回顾</button>
+      <button class="tab-btn" onclick="switchTab('stoploss', this)">5. 3 个止损节点</button>
+    </div>
+
+    <!-- TAB 0: Interactive Dashboard -->
+    <div id="tab-dashboard" class="section active">
+      <!-- Daily Logger -->
+      <div class="card" id="logger-card">
+        <h2>
+          <span>今日战报录入台</span>
+          <button class="btn-amber" onclick="useBufferShield()" title="消耗 3 题余量银行，保护今日不断签">🛡️ 消耗 3 题余量保签今日</button>
+        </h2>
+
+        <div class="quota-banner" id="quota-preview"></div>
+
+        <div class="logger-grid">
+          <div class="field field-full">
+            <label>打卡日期</label>
+            <input type="date" id="log-date" />
+          </div>
+          <div class="field field-full">
+            <label>今日模式（自动匹配三档线）</label>
+            <select id="log-mode" onchange="updateQuotaPreview()">
+              <optgroup label="一轮 1A · 大三上 (W1–W8)">
+                <option value="1a_normal">1A 周一~四 · 普通新题日 (2.5h)</option>
+                <option value="1a_lecture">1A 周一~四 · 开章听框架日 (2.5h)</option>
+                <option value="1a_fri">1A 周五上班 · 选填/计算快刷 (1h)</option>
+                <option value="1a_sat">1A 周六上班 · 错题订正日 (1h)</option>
+                <option value="1a_sun">1A 周日 · 纯回顾清零日 (1.5h)</option>
+              </optgroup>
+              <optgroup label="一轮 1B · 寒假 5 周 (W9–W13)">
+                <option value="1b_1h">1B 寒假 · 完整 1h 新题日</option>
+                <option value="1b_half">1B 寒假 · 0.5h 疲惫保底日</option>
+              </optgroup>
+              <optgroup label="一轮 1C · 大三下开学 (W14–W21)">
+                <option value="1c_normal">1C 工作日 · 普通新题日 (3.5h)</option>
+                <option value="1c_hard">1C 工作日 · 难题/听框架日 (3.5h)</option>
+                <option value="1c_sat">1C 周六 · 攻坚练习日 (3.5h)</option>
+                <option value="1c_sun">1C 周日 · 纯回顾清零日 (2h)</option>
+              </optgroup>
+              <optgroup label="二 / 三 / 四轮">
+                <option value="r2_early">二轮前段(4–5月) · 强化篇 (1.5–2h)</option>
+                <option value="r2_late">二轮后段(6–7月) · 强化篇 (2.5–3h)</option>
+                <option value="r3_surgery">三轮 · 专题手术/错题日 (3.5h)</option>
+                <option value="r3_exam">三轮/四轮 · 整套真题/模拟模考日</option>
+              </optgroup>
+            </select>
+          </div>
+          <div class="field field-full">
+            <label>主攻章节（自动点亮章节地图）</label>
+            <select id="log-chapter">
+              <option value="ch1">Ch1 函数、极限、连续 (剩21题起步)</option>
+              <option value="ch2">Ch2 导数与微分 (67题)</option>
+              <option value="ch3">Ch3 中值定理与微分应用 (71题)</option>
+              <option value="ch4">Ch4 不定积分 (60题)</option>
+              <option value="ch5">Ch5 定积分及应用 (110题)</option>
+              <option value="ch6">Ch6 多元函数微分学 (70题)</option>
+              <option value="ch7">Ch7 微分方程 (68题)</option>
+              <option value="ch8">Ch8 二重积分 (66题)</option>
+              <option value="ch9">Ch9 三重与曲线曲面积分 (90题)</option>
+              <option value="ch10">Ch10 无穷级数 (97题)</option>
+              <option value="ch11">Ch11 向量代数与空间几何 (41题)</option>
+              <option value="other">其他（二轮强化 / 真题 / 模拟 / 跨章混刷）</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>今日新题</label>
+            <input type="number" id="log-new" min="0" max="200" value="7" />
+          </div>
+          <div class="field">
+            <label>错题重算</label>
+            <input type="number" id="log-wrong" min="0" max="200" value="0" />
+          </div>
+          <div class="field">
+            <label>时长(h)</label>
+            <input type="number" id="log-hours" min="0" max="16" step="0.5" value="2.5" />
+          </div>
+          <div class="field field-full">
+            <label>一句复盘备注（选填）</label>
+            <input type="text" id="log-note" placeholder="如：泰勒展开卡壳已看切片" />
+          </div>
+          <div class="field field-full">
+            <button class="btn-primary" style="width:100%;" onclick="submitDailyLog()">提交今日战报 🚀</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Heatmap -->
+      <div class="card">
+        <h2>
+          <span>13 个月备考热力图（2026-11-16 ~ 2027-12-19）</span>
+          <span style="font-size:12px;font-weight:400;color:var(--muted);">点击任意格子可快速补录或修改当日战报</span>
+        </h2>
+        <div class="heatmap-outer">
+          <div class="heatmap-months" id="hm-months"></div>
+          <div class="heatmap-body">
+            <div class="heatmap-days-label">
+              <span>一</span><span></span><span>三</span><span></span><span>五</span><span></span><span>日</span>
+            </div>
+            <div class="heatmap-grid" id="hm-grid"></div>
+          </div>
+        </div>
+        <div class="hm-legend">
+          <span>图例：</span>
+          <span><i class="hm-dot" style="background:#e5eaf2"></i>未记录</span>
+          <span><i class="hm-dot" style="background:#86efac"></i>🟢 达保底（不断签）</span>
+          <span><i class="hm-dot" style="background:#10b981"></i>🔵 达应该（按期推进）</span>
+          <span><i class="hm-dot" style="background:#f59e0b"></i>🔥 超额暴击（攒余量）</span>
+          <span><i class="hm-dot" style="background:#93c5fd"></i>🛡️ 余量保签日</span>
+        </div>
+      </div>
+
+      <!-- 11 Chapters Map -->
+      <div class="card">
+        <h2>
+          <span>《1800·高数基础篇》11 章通关地图（满格自动盖章通关）</span>
+          <span style="font-size:12px;font-weight:400;color:var(--muted);" id="ch-cleared-count">已通关 0 / 11 章</span>
+        </h2>
+        <div class="chapter-grid" id="chapter-grid"></div>
+      </div>
+
+      <!-- Milestone Badges -->
+      <div class="card">
+        <h2>
+          <span>里程碑勋章墙</span>
+          <span style="font-size:12px;font-weight:400;color:var(--muted);" id="badge-count">已解锁 0 / 10 枚</span>
+        </h2>
+        <div class="badge-grid" id="badge-grid"></div>
+      </div>
+
+      <!-- Recent Logs -->
+      <div class="card">
+        <h2>
+          <span>近期打卡流水（最近 15 条）</span>
+          <button class="btn-outline" onclick="clearAllLogs()">清空全部打卡</button>
+        </h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>日期</th>
+                <th>战果定级</th>
+                <th>模式 &amp; 章节</th>
+                <th>新题 / 错题</th>
+                <th>时长</th>
+                <th>获得 XP / 余量</th>
+                <th>备注</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="logs-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 1: Daily Quotas & 4-Round Overview -->
+    <div id="tab-quotas" class="section">
+      <div class="card">
+        <h2>一、每日「保底 / 应该 / 超额」题量三档标准</h2>
+        <h3>第一轮（《1800》高数基础篇，剩余 761 题）</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>阶段</th>
+                <th>日期与时长</th>
+                <th>日期类型</th>
+                <th>🟢 保底 *(不断签)*</th>
+                <th>🔵 应该 *(按期线)*</th>
+                <th>🔥 超额 *(攒余量)*</th>
+                <th>折算周产能</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="tag tag-blue">1A 大三上</span><br>W1–W8</td>
+                <td>周一~四（2.5h）</td>
+                <td>普通新题日（Ch1/2/4/5前）</td>
+                <td><strong>5 题</strong></td>
+                <td><strong>7 题</strong></td>
+                <td><strong>9 题+</strong></td>
+                <td>周一~四 28 + 周五 5<br><strong>周均 ~33 题</strong></td>
+              </tr>
+              <tr>
+                <td><span class="tag tag-blue">1A 大三上</span></td>
+                <td>周一~四（2.5h）</td>
+                <td>开新章听框架日（Ch3/Ch5首日）</td>
+                <td><strong>2 题</strong> *(+听课1.5h)*</td>
+                <td><strong>4 题</strong> *(+听课1.5h)*</td>
+                <td><strong>6 题+</strong></td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td><span class="tag tag-blue">1A 大三上</span></td>
+                <td>周五（上班 1h）</td>
+                <td>选填 / 纯计算快刷日</td>
+                <td><strong>3 题</strong></td>
+                <td><strong>5 题</strong></td>
+                <td><strong>7 题+</strong></td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td><span class="tag tag-blue">1A 大三上</span></td>
+                <td>周六（上班 1h）</td>
+                <td>本周错题订正重算日</td>
+                <td><strong>4 道错题</strong></td>
+                <td><strong>6 道错题</strong></td>
+                <td><strong>8 道错题+</strong></td>
+                <td>清错题</td>
+              </tr>
+              <tr>
+                <td><span class="tag tag-blue">1A 大三上</span></td>
+                <td>周日（1.5h）</td>
+                <td>纯回顾清零日（不开新章）</td>
+                <td><strong>5 道错题</strong></td>
+                <td><strong>8 道错题</strong></td>
+                <td><strong>12 道错题+</strong></td>
+                <td>清错题</td>
+              </tr>
+              <tr>
+                <td><span class="tag tag-amber">1B 寒假</span><br>W9–W13</td>
+                <td>每天（完整 1h）</td>
+                <td>寒假新题日</td>
+                <td><strong>3 题</strong> *(听课日1题)*</td>
+                <td><strong>4 题</strong> *(听课日2题)*</td>
+                <td><strong>6 题+</strong></td>
+                <td><strong>周均 16–20 题</strong></td>
+              </tr>
+              <tr>
+                <td><span class="tag tag-amber">1B 寒假</span></td>
+                <td>每天（仅 0.5h）</td>
+                <td>疲惫保底日（练车/兼职后）</td>
+                <td><strong>3 道旧错题</strong></td>
+                <td><strong>4 道旧错题</strong></td>
+                <td><strong>5 错题 + 1 新题</strong></td>
+                <td>保手感不断签</td>
+              </tr>
+              <tr>
+                <td><span class="tag tag-green">1C 大三下</span><br>W14–W21</td>
+                <td>周一~五（3.5h）</td>
+                <td>普通新题日（Ch7/8/11）</td>
+                <td><strong>8 题</strong></td>
+                <td><strong>11 题</strong></td>
+                <td><strong>14 题+</strong></td>
+                <td><strong>周均 52–62 题</strong></td>
+              </tr>
+              <tr>
+                <td><span class="tag tag-green">1C 大三下</span></td>
+                <td>周一~五（3.5h）</td>
+                <td>难题/听框架日（Ch5证明/Ch9/10）</td>
+                <td><strong>5 题</strong> *(含听课)*</td>
+                <td><strong>8 题</strong> *(含听课)*</td>
+                <td><strong>11 题+</strong></td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td><span class="tag tag-green">1C 大三下</span></td>
+                <td>周六（3.5h）</td>
+                <td>攻坚 / 跨章练习日</td>
+                <td><strong>6 题</strong></td>
+                <td><strong>9 题</strong></td>
+                <td><strong>12 题+</strong></td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td><span class="tag tag-green">1C 大三下</span></td>
+                <td>周日（2h）</td>
+                <td>纯回顾清零日</td>
+                <td><strong>8 道错题</strong></td>
+                <td><strong>12 道错题</strong></td>
+                <td><strong>16 道错题+</strong></td>
+                <td>清错题</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>第二、三、四轮每日标准</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>轮次与时间</th>
+                <th>当日高数时长</th>
+                <th>日期类型</th>
+                <th>🟢 保底</th>
+                <th>🔵 应该</th>
+                <th>🔥 超额</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>二轮前段 (4–5月)</td>
+                <td>1.5–2h/天 *(让位线代概率)*</td>
+                <td>1800 强化篇日</td>
+                <td><strong>4 题</strong></td>
+                <td><strong>6 题</strong></td>
+                <td><strong>8 题+</strong></td>
+              </tr>
+              <tr>
+                <td>二轮后段 (6–7月)</td>
+                <td>2.5–3h/天</td>
+                <td>1800 强化篇日</td>
+                <td><strong>6 题</strong></td>
+                <td><strong>8 题</strong></td>
+                <td><strong>10 题+</strong></td>
+              </tr>
+              <tr>
+                <td>三轮模考日 (7–10月)</td>
+                <td>3.5h/天 *(周二/五/六)*</td>
+                <td>全真套卷日</td>
+                <td>做完 1 套真题</td>
+                <td>1 套真题 + 批完高数错题</td>
+                <td>+ 同源薄弱题 5 题</td>
+              </tr>
+              <tr>
+                <td>三轮手术日 (7–10月)</td>
+                <td>3.5h/天 *(周一/三/四)*</td>
+                <td>专题手术 / 错题日</td>
+                <td><strong>10 题</strong></td>
+                <td><strong>15 题</strong></td>
+                <td><strong>20 题+</strong></td>
+              </tr>
+              <tr>
+                <td>四轮冲刺 (10–12月初)</td>
+                <td>2–3h/天</td>
+                <td>模拟卷 / 速刷日</td>
+                <td>1 套选填(16题) 或 半套精析</td>
+                <td>1 套模拟卷 / 1 套精批+10错题</td>
+                <td>+ 1 组 45min 选填限时</td>
+              </tr>
+              <tr>
+                <td>考前 2 周 (12.06–12.18)</td>
+                <td>2h/天</td>
+                <td>保手热 + 默写日</td>
+                <td>1 组选填(16题)</td>
+                <td>1 组选填 + 2 大题 + 1 页公式默写</td>
+                <td>+ 10 道高危错题</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>二、四轮总览与并行科目策略</h2>
+        <div class="grid-2">
+          <div class="callout">
+            <strong>一轮是否开数据结构：</strong>
+            <ul class="clean">
+              <li><strong>11.19–02.21 不开数据结构</strong>：除数学外仅用每天 20–30min 恢复英语词汇与长难句。</li>
+              <li><strong>02.22 大三下开学起正式开数据结构</strong>：总时长涨至 8h/天，下午 2.5h 整块给 408。</li>
+            </ul>
+          </div>
+          <div class="callout warn">
+            <strong>B 档基础听课双轨校准：</strong>
+            <ul class="clean">
+              <li><strong>计算章（Ch1/2/4/7/8/11）</strong>：先做题，卡壳 &gt;5min 看解析或听 15min 切片。</li>
+              <li><strong>概念/定理章（Ch3/5/6/9/10）</strong>：开刷前先花 1.5–2h 1.5 倍速听完核心框架课。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>轮次</th>
+                <th>起止时间与占比</th>
+                <th>核心目标</th>
+                <th>用书与范围</th>
+                <th>过轮硬性自测指标</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="tag tag-blue">一轮</span><br>地基补洞</td>
+                <td>2026-11-19 ~ 2027-04-18<br>21.5 周（5.0 个月）</td>
+                <td>啃透基础篇 11 章 845 题，消除盲区，建错题本</td>
+                <td>《1800》基础篇·高数全 11 章（P3–P96）</td>
+                <td>1. 845 题全刷完并二刷错题；<br>2. 导图重点题抽测正确率 <strong>≥80%</strong>；<br>3. 不定积分 40 题二刷 <strong>≥85%</strong>。</td>
+              </tr>
+              <tr>
+                <td><span class="tag tag-purple">二轮</span><br>强化综合</td>
+                <td>2027-04-19 ~ 2027-07-18<br>13 周（3.0 个月）</td>
+                <td>跨章综合解题与证明模板（4–5 月并行线代/概率基础）</td>
+                <td>《1800》强化篇·高数全 10 章（P161–P206）</td>
+                <td>1. 强化高数约 450–500 题清零；<br>2. 早年真题单测高数 100min <strong>≥68/84 分</strong>；<br>3. 证明与级数大题无空白。</td>
+              </tr>
+              <tr>
+                <td><span class="tag tag-amber">三轮</span><br>真题手术</td>
+                <td>2027-07-19 ~ 2027-10-17<br>13 周（3.0 个月）</td>
+                <td>上午 3h 全卷高压，围绕 140+ 精准手术薄弱专题</td>
+                <td>2008–2027 数一真题（20 套）+ 错题三刷</td>
+                <td>1. 近 10 年真题稳定 <strong>130+</strong>，高数扣分 <strong>≤6 分</strong>；<br>2. 选填 ≤55min，最多错 1 题；<br>3. 冷门考点闭卷全会。</td>
+              </tr>
+              <tr>
+                <td><span class="tag tag-green">四轮</span><br>冲刺定型</td>
+                <td>2027-10-18 ~ 2027-12-18<br>9 周（2.0 个月）</td>
+                <td>维持陌生题抗压与上午 8:30 手感，全覆盖防遗忘</td>
+                <td>模拟卷 8–12 套（李林 6+4 等）+ 速查卡</td>
+                <td>1. 常规模拟卷 <strong>130–140+</strong>；<br>2. 考前 1 周 11 章公式闭卷默写 <strong>100%</strong>；<br>3. 数学不断档超 1 天。</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: Weekly Checklist -->
+    <div id="tab-weekly" class="section">
+      <div class="card">
+        <h2>逐周任务清单（W1–W56.5，自动保存勾选）</h2>
+        <div class="toolbar">
+          <div class="filter-group">
+            <button class="filter-btn active" data-filter="all" onclick="filterWeeks('all', this)">全部</button>
+            <button class="filter-btn" data-filter="r1" onclick="filterWeeks('r1', this)">一轮基础 (W1–W21)</button>
+            <button class="filter-btn" data-filter="winter" onclick="filterWeeks('winter', this)">寒假 5 周 (W9–W13)</button>
+            <button class="filter-btn" data-filter="r2" onclick="filterWeeks('r2', this)">二轮强化 (W22–W34)</button>
+            <button class="filter-btn" data-filter="r3" onclick="filterWeeks('r3', this)">三轮真题 (W35–W47)</button>
+            <button class="filter-btn" data-filter="r4" onclick="filterWeeks('r4', this)">四轮冲刺 (W48–W56.5)</button>
+          </div>
+          <button class="btn-outline" onclick="resetWeeks()">重置周勾选</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:46px;">完成</th>
+                <th style="width:88px;">轮次</th>
+                <th style="width:120px;">周次 / 日期</th>
+                <th>核心高数任务</th>
+                <th style="width:110px;">工时 / 题量</th>
+                <th style="width:230px;">回顾与配套动作</th>
+              </tr>
+            </thead>
+            <tbody id="weeks-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: Schedule -->
+    <div id="tab-schedule" class="section">
+      <div class="card">
+        <h2>表 A：当前阶段固定时间表（W1–W8：11.19 ~ 01.17）</h2>
+        <p style="margin-top:0;color:var(--muted);">硬约束：周一~四数学上限 <strong>2.5h</strong>，周五六上班 <strong>1h</strong>，周日 <strong>1.5h</strong>（合计 13.5h/周）；不开数据结构，仅恢复英语。</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>时段</th>
+                <th>周一 ~ 周四（数学 2.5h）</th>
+                <th>周五（上班，数学 1h）</th>
+                <th>周六（上班，数学 1h）</th>
+                <th>周日（复盘日，数学 1.5h）</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>碎片时间</strong></td>
+                <td>英语单词 25min</td>
+                <td>英语单词 20min</td>
+                <td>英语单词 20min</td>
+                <td>英语长难句 2 句精析 30min</td>
+              </tr>
+              <tr>
+                <td><strong>晚间整块 1</strong></td>
+                <td><strong>数学 1.5h（独立刷题）</strong>：严格闭卷写新题（禁边翻解析边做）</td>
+                <td><strong>数学 1h（低切换）</strong>：选填快刷 / 纯计算题</td>
+                <td><strong>数学 1h（低切换）</strong>：仅订正与重算本周错题</td>
+                <td><strong>数学 1.5h（纯回顾）</strong>：60min 闭卷重算本周错题 + 30min 公式卡</td>
+              </tr>
+              <tr>
+                <td><strong>晚间整块 2</strong></td>
+                <td><strong>数学 1h</strong>：40min 批改并听切片课 + 20min 当日快筛</td>
+                <td>休整 / 英语长难句 20min</td>
+                <td>休整 / 英语长难句 20min</td>
+                <td>彻底休整半天</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>表 B：大三下及以后固定时间表（W14 起：02.22 ~ 10.17，每日 8h）</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>时段</th>
+                <th>周一 ~ 周五（工作日 8h）</th>
+                <th>周六（测试/强化 6.5–7h）</th>
+                <th>周日（复盘 + 休整 3h）</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>08:30–12:00</strong> (3.5h)</td>
+                <td><strong>数学 3.5h</strong>：2h 新题/强化（三轮直接 8:30–11:30 3h 全真套卷）+ 1.5h 深度订正</td>
+                <td><strong>数学 3.5h</strong>：二轮薄弱专题 / 三四轮第 2 套模考</td>
+                <td><strong>数学 2h（纯回顾）</strong>：本周错题闭卷二刷 + 公式抽默</td>
+              </tr>
+              <tr>
+                <td><strong>14:00–16:30</strong> (2.5h)</td>
+                <td><strong>408 专业课 2.5h</strong>：02.22 起开数据结构（听课+手写代码+王道），后接计组/OS/计网</td>
+                <td><strong>408 复盘 2h</strong>：手写本周代码题 + 错题重做</td>
+                <td><strong>408 本周错题/代码回顾 1h</strong></td>
+              </tr>
+              <tr>
+                <td><strong>19:00–21:00</strong> (2h)</td>
+                <td><strong>英语 1.5h</strong>（阅读精翻+词汇）+ <strong>当日快筛回顾 0.5h</strong></td>
+                <td><strong>英语 1.5h</strong>（长难句/新题型/作文）</td>
+                <td><strong>周日晚完全休息</strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: Risks & Review -->
+    <div id="tab-risks" class="section">
+      <div class="card">
+        <h2>两大专项风险应对方案</h2>
+        <div class="grid-2">
+          <div class="callout">
+            <h3 style="margin-top:0;">风险 A：一轮单次 ≤2.5h、周五六 1h 与后期 3h 矛盾</h3>
+            <ul class="clean">
+              <li><strong>一轮硬切割</strong>：框架课、证明大题、“1.5h 做+1h 改”闭环放 <strong>周一~四 2.5h</strong>；选填/纯计算/错题重算放 <strong>周五六 1h</strong>；<strong>周日 1.5h</strong> 纯回顾不开新章。</li>
+              <li><strong>后期自然化解</strong>：02.22 起不上班且几乎没课，上午 08:30–11:30 天然拥有 3.5h 整块，无缝承接三四轮 3 小时真题。</li>
+            </ul>
+          </div>
+          <div class="callout warn">
+            <h3 style="margin-top:0;">风险 B：寒假 5 周（0.5–1h/天）保底与节后追赶</h3>
+            <ul class="clean">
+              <li><strong>寒假 3 铁律</strong>：① 只做计算与应用，跳过 Ch5 第 36–46 题证明；② 仅剩 0.5h 绝不开新题，重算 3–4 道旧错题不断签；③ 5 周保底 60–80 新题 + 50 旧错题。</li>
+              <li><strong>02.22 节后追赶</strong>：W14 前 3 天（~10h）专职补完 Ch5 标星证明 11 题 + Ch6 解答 10 题，后 4 天推 Ch7 前半，W15 末完全对齐。</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>四级「回顾复习」防遗忘机制</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>层级</th><th>频率与耗时</th><th>具体执行动作</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>① 当日快筛</strong></td><td>每天收尾 15–20min</td><td>圈出当日错题，口头/草稿过“第一步切入点”，不重算全过程。</td></tr>
+              <tr><td><strong>② 周末清零</strong></td><td>每周日（1.5h / 2h）</td><td><strong>闭卷重算</strong>本周红圈错题；二次出错升级为「★ 高危错题」进错题本。</td></tr>
+              <tr><td><strong>③ 跨章混刷</strong></td><td>每学完 2 章</td><td>占 1 个整块，从前面已过章节导图「重点题」随机抽 8–10 题混做。</td></tr>
+              <tr><td><strong>④ 轮末封口</strong></td><td>每轮最后 1 周（W21/W34）</td><td>零新题，分类重做本轮全部「★ 高危错题」。</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 5: Stop-Loss -->
+    <div id="tab-stoploss" class="section">
+      <div class="card">
+        <h2>3 个止损与动态调整节点</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>止损时间点</th><th>触发预警信号</th><th>具体砍掉什么</th><th>坚决保住什么</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="tag tag-amber">节点 1</span><br><strong>2027-02-21</strong><br>(W13 末)</td>
+                <td>寒假未完 Ch5 应用与 Ch6 前半；或 Ch1–Ch5 重点题回炉正确率 <strong>＜60%</strong>。</td>
+                <td>砍掉“盲刷再零散看课”；<strong>推迟 408 数据结构 2 周开启</strong>（延至 03.08）。</td>
+                <td>W14 整周系统听 Ch5/Ch6 框架课，只刷重点题+一半相关题，<strong>死保一元+多元微积分底盘</strong>。</td>
+              </tr>
+              <tr>
+                <td><span class="tag tag-red">节点 2</span><br><strong>2027-04-18</strong><br>(W21 末)</td>
+                <td>基础篇仍剩 <strong>＞80 题</strong>，且 408 进度受挤压。</td>
+                <td>砍掉 Ch11 全刷与 Ch9/Ch10 非重点偏题；二轮砍掉重复常规计算题。</td>
+                <td><strong>绝不推迟 4 月下旬开启线代与概率基础</strong>，高数 10% 尾项并入二轮消化。</td>
+              </tr>
+              <tr>
+                <td><span class="tag tag-purple">节点 3</span><br><strong>2027-09-26</strong><br>(W44 末)</td>
+                <td>近 10 年真题稳在 <strong>115 分以下</strong>（高数扣分 ＞18 分）；408 滞后。</td>
+                <td>数学目标由 <strong>140+ 下调至「稳 125–130+」</strong>；砍掉偏难怪压轴证明。</td>
+                <td><strong>死保选填 ≥70/80 分 + 常规计算大题零失误</strong>，省下每天 1h 转投 408 提分。</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = "postgrad_math_v2_state";
+
+    const MODES = {
+      "1a_normal":  { label: "1A 普通新题日 (2.5h)",     metric: "new",   base: 5,  should: 7,  over: 9,  unit: "新题" },
+      "1a_lecture": { label: "1A 听框架日 (2.5h)",       metric: "new",   base: 2,  should: 4,  over: 6,  unit: "新题" },
+      "1a_fri":     { label: "1A 周五快刷 (1h)",         metric: "new",   base: 3,  should: 5,  over: 7,  unit: "新题" },
+      "1a_sat":     { label: "1A 周六错题日 (1h)",       metric: "wrong", base: 4,  should: 6,  over: 8,  unit: "错题" },
+      "1a_sun":     { label: "1A 周日回顾日 (1.5h)",     metric: "wrong", base: 5,  should: 8,  over: 12, unit: "错题" },
+      "1b_1h":      { label: "1B 寒假 1h 新题日",        metric: "new",   base: 3,  should: 4,  over: 6,  unit: "新题" },
+      "1b_half":    { label: "1B 寒假 0.5h 保底日",      metric: "wrong", base: 3,  should: 4,  over: 5,  unit: "错题" },
+      "1c_normal":  { label: "1C 工作日普通 (3.5h)",     metric: "new",   base: 8,  should: 11, over: 14, unit: "新题" },
+      "1c_hard":    { label: "1C 难题/框架日 (3.5h)",    metric: "new",   base: 5,  should: 8,  over: 11, unit: "新题" },
+      "1c_sat":     { label: "1C 周六攻坚 (3.5h)",       metric: "new",   base: 6,  should: 9,  over: 12, unit: "新题" },
+      "1c_sun":     { label: "1C 周日回顾 (2h)",         metric: "wrong", base: 8,  should: 12, over: 16, unit: "错题" },
+      "r2_early":   { label: "二轮前段强化 (1.5–2h)",    metric: "new",   base: 4,  should: 6,  over: 8,  unit: "强化题" },
+      "r2_late":    { label: "二轮后段强化 (2.5–3h)",    metric: "new",   base: 6,  should: 8,  over: 10, unit: "强化题" },
+      "r3_surgery": { label: "三轮专题/错题手术",        metric: "total", base: 10, should: 15, over: 20, unit: "总题" },
+      "r3_exam":    { label: "三/四轮全真套卷模考日",    metric: "total", base: 16, should: 22, over: 27, unit: "套卷题" }
+    };
+
+    const CHAPTERS = [
+      { id: "ch1",  name: "Ch1 函数、极限、连续",     total: 105, init: 84 },
+      { id: "ch2",  name: "Ch2 导数与微分",           total: 67,  init: 0 },
+      { id: "ch3",  name: "Ch3 中值定理与微分应用",   total: 71,  init: 0 },
+      { id: "ch4",  name: "Ch4 不定积分",             total: 60,  init: 0 },
+      { id: "ch5",  name: "Ch5 定积分及应用",         total: 110, init: 0 },
+      { id: "ch6",  name: "Ch6 多元函数微分学",       total: 70,  init: 0 },
+      { id: "ch7",  name: "Ch7 微分方程",             total: 68,  init: 0 },
+      { id: "ch8",  name: "Ch8 二重积分",             total: 66,  init: 0 },
+      { id: "ch9",  name: "Ch9 三重与曲线曲面积分",   total: 90,  init: 0 },
+      { id: "ch10", name: "Ch10 无穷级数",            total: 97,  init: 0 },
+      { id: "ch11", name: "Ch11 向量代数与空间几何",  total: 41,  init: 0 }
+    ];
+
+    const LEVELS = [
+      { lv: 1,  xp: 0,     title: "极限入门" },
+      { lv: 2,  xp: 1200,  title: "求导熟手" },
+      { lv: 3,  xp: 2200,  title: "一元微积分学徒" },
+      { lv: 4,  xp: 3600,  title: "积分计算狂人" },
+      { lv: 5,  xp: 5500,  title: "多元微分破局者" },
+      { lv: 6,  xp: 8000,  title: "级数与线面征服者" },
+      { lv: 7,  xp: 11000, title: "基础篇大满贯" },
+      { lv: 8,  xp: 15000, title: "强化综合大师" },
+      { lv: 9,  xp: 20000, title: "真题手术刀" },
+      { lv: 10, xp: 26000, title: "复旦 140+ 候选人" }
+    ];
+
+    const WEEKS_DATA = [
+      { id: "W1", round: "r1", tag: "一轮 1A", date: "11.19–11.29 (1.5周)", task: "完结 Ch1 剩余 6 考点（21 题）+ 开启 Ch2 前 35 题（P15–19）", load: "~20h / 56 题", review: "周日重做 Ch1 标星错题（~15 题）" },
+      { id: "W2", round: "r1", tag: "一轮 1A", date: "11.30–12.06", task: "完结 Ch2 剩余（P19–22，基础填后半 + 解答 19 题）", load: "13.5h / 32 题", review: "周日二刷 Ch2 错题 + Ch1 概念抽检 10 题" },
+      { id: "W3", round: "r1", tag: "一轮 1A", date: "12.07–12.13", task: "【前置 2h 听 Ch3 框架】Ch3 入门 20 题 + 基础选填 18 题", load: "13.5h / 38 题", review: "周日复盘 Ch2 高阶导/导数定义错题" },
+      { id: "W4", round: "r1", tag: "一轮 1A", date: "12.14–12.20", task: "完结 Ch3 基础解答 1~33（不等式、方程根、极值）", load: "13.5h / 33 题", review: "周日混刷 Ch1–Ch3 导图「重点题」12 题" },
+      { id: "W5", round: "r1", tag: "一轮 1A", date: "12.21–12.27", task: "Ch4「不定积分」入门 20 题 + 基础 1~15（第一类换元）", load: "13.5h / 35 题", review: "周日背默基本积分表 + 重算本周错题" },
+      { id: "W6", round: "r1", tag: "一轮 1A", date: "12.28–01.03", task: "完结 Ch4 基础 16~40（第二类换元/有理/分部/三角）", load: "13.5h / 25 题", review: "周日重刷 Ch4 全错题 + Ch3 证明模板复盘" },
+      { id: "W7", round: "r1", tag: "一轮 1A", date: "01.04–01.10", task: "【前置 1.5h 过 Ch5 框架】Ch5 入门 20 题 + 基础选 1~13", load: "~11h / 33 题", review: "周日复盘 Ch4 分部/三角换元错题" },
+      { id: "W8", round: "r1", tag: "一轮 1A", date: "01.11–01.17", task: "Ch5 基础填 1~15 + 基础解答 1~15（定积分计算与变限积分）", load: "~10h / 30 题", review: "周日归档 Ch1–Ch5 错题本供寒假复盘" },
+      { id: "W9", round: "r1 winter", tag: "寒假 W1", date: "01.18–01.24", task: "Ch5 基础解答 16~35（跳过 36~46 证明）", load: "5h / 20 题", review: "每天碎片 15min 过 Ch4/Ch5 错题各 3 题" },
+      { id: "W10", round: "r1 winter", tag: "寒假 W2", date: "01.25–01.31", task: "完结 Ch5 几何/物理应用（基础解答 47~62）", load: "5h / 16 题", review: "二刷 Ch4 不定积分错题 15 题" },
+      { id: "W11", round: "r1 winter", tag: "寒假 W3", date: "02.01–02.07", task: "【前置 1.5h 听 Ch6 框架】Ch6 入门 20 题", load: "5h / 20 题", review: "碎片复盘 Ch1–Ch3 概念选择题 15 题" },
+      { id: "W12", round: "r1 winter", tag: "寒假 W4", date: "02.08–02.14", task: "Ch6 基础选填（基础一 1~12 + 基础二 1~13）", load: "5h / 25 题", review: "碎片复盘 Ch5 变限积分与反常积分错题" },
+      { id: "W13", round: "r1 winter", tag: "寒假 W5", date: "02.15–02.21", task: "Ch6 基础解答 1~15 + 寒假底线自检（止损节点 1）", load: "5h / 15 题", review: "周日清点寒假标星题，准备开学追赶" },
+      { id: "W14", round: "r1", tag: "一轮 1C", date: "02.22–02.28", task: "【开 408 数据结构+英语】补 Ch5 证明(11) + Ch6 尾(10) + Ch7 入门 19 + 基础一 11", load: "22h / 51 题", review: "周日 2h 闭卷重算 Ch5 证明 & Ch6 极值错题" },
+      { id: "W15", round: "r1", tag: "一轮 1C", date: "03.01–03.07", task: "完结 Ch7 基础二(13) + 基础三(25) + Ch8 入门 20 题", load: "22h / 58 题", review: "周日复盘 Ch7 各类方程通解求法" },
+      { id: "W16", round: "r1", tag: "一轮 1C", date: "03.08–03.14", task: "完结 Ch8 基础一(11) + 二(10) + 三(25) +【前置 2h 听 Ch9 框架】", load: "22h / 46 题", review: "周日二刷 Ch6–Ch8 错题本 20 题" },
+      { id: "W17", round: "r1", tag: "一轮 1C", date: "03.15–03.21", task: "Ch9「三重与曲线曲面积分」入门 20 + 基础选填 29", load: "22h / 49 题", review: "周日汇总三重/两类曲线积分对称性结论" },
+      { id: "W18", round: "r1", tag: "一轮 1C", date: "03.22–03.28", task: "【曲面积分框架】完结 Ch9 解答(41) +【Ch10 框架】+ Ch10 入门(21)", load: "22h / 62 题", review: "周日专攻 Ch9 错题与有向曲面方向判定" },
+      { id: "W19", round: "r1", tag: "一轮 1C", date: "03.29–04.04", task: "Ch10「无穷级数」基础一(21) + 二(11) + 三 1~25", load: "22h / 57 题", review: "周日背默正项/交错级数 7 种判别法" },
+      { id: "W20", round: "r1", tag: "一轮 1C", date: "04.05–04.11", task: "完结 Ch10 解答 26~44 + 完结 Ch11（41 题）", load: "22h / 60 题", review: "周日对照 11 章导图统计全书剩余错题" },
+      { id: "W21", round: "r1", tag: "一轮收口", date: "04.12–04.18", task: "零新题：二刷全本错题 + 一轮过轮自测（止损节点 2）", load: "22h / ~120错题", review: "完成一轮 11 章知识树与高危错题清单" },
+      { id: "W22–23", round: "r2", tag: "二轮强化", date: "04.19–05.02", task: "强化 Ch1（并行线代基础）", load: "13h/周 · 35题", review: "周日 1h 回炉基础 Ch1 错题" },
+      { id: "W24–25", round: "r2", tag: "二轮强化", date: "05.03–05.16", task: "强化 Ch2 + Ch3 前半", load: "13h/周 · 35题", review: "整理 1 页“辅助函数构造对照表”" },
+      { id: "W26–27", round: "r2", tag: "二轮强化", date: "05.17–05.30", task: "强化 Ch3 后半 + Ch4 前半", load: "14h/周 · 35题", review: "重刷 Ch3 标星证明题" },
+      { id: "W28–29", round: "r2", tag: "二轮强化", date: "05.31–06.13", task: "强化 Ch4 后半 + Ch5", load: "17h/周 · 42题", review: "总结一元/多元极值与可微陷阱" },
+      { id: "W30–31", round: "r2", tag: "二轮强化", date: "06.14–06.27", task: "强化 Ch6 + Ch7", load: "17h/周 · 42题", review: "二刷强化 Ch1–Ch4 标红错题 25 题" },
+      { id: "W32–33", round: "r2", tag: "二轮强化", date: "06.28–07.11", task: "强化 Ch8 + Ch9", load: "18h/周 · 42题", review: "专题总结补面高斯、奇点挖洞、和函数转方程" },
+      { id: "W34", round: "r2", tag: "二轮收口", date: "07.12–07.18", task: "强化 Ch10 + 二轮过轮抽测（早年真题高数 100min）", load: "18h · 30题+测", review: "全 10 章强化错题按三类归档" },
+      { id: "W35–39", round: "r3", tag: "三轮真题", date: "07.19–08.22", task: "2008–2017 数一真题（每周 2 套：周二/五 8:30–11:30）", load: "24h/周 · 2套", review: "周日同源薄弱专题抽刷 25 题" },
+      { id: "W40–44", round: "r3", tag: "三轮真题", date: "08.23–09.26", task: "2018–2024 数一真题（7 套）+ 140+ 精度手术（止损节点 3）", load: "22h/周 · 1.5套", review: "选填 ≤55min 最多错 1 题，大题抠步骤分" },
+      { id: "W45–47", round: "r3", tag: "三轮压测", date: "09.27–10.17", task: "2025–2027 最新 3 套真题压测 + 错题卷二刷", load: "22h/周 · 1套+", review: "冷门考点清零（旋度散度/傅里叶/欧拉/形心）" },
+      { id: "W48–51", round: "r4", tag: "四轮冲刺", date: "10.18–11.14", task: "每周 2 套优质模拟卷（李林 6 套等），8:30–11:30 卡点", load: "18h/周 · 2套", review: "周日重做近 10 年真题高数错题 20 题" },
+      { id: "W52–54", round: "r4", tag: "四轮冲刺", date: "11.15–12.05", task: "每周 1–2 套模拟卷 + 每周 2 组选填 45min 速刷", load: "15h/周", review: "让位 408 与肖四肖八，保数学手热" },
+      { id: "W55–56.5", round: "r4", tag: "考前定型", date: "12.06–12.18", task: "停新偏难卷；每日 8:30–10:30 选填+2常规大题热身", load: "13h/周", review: "闭卷默写 11 章公式 + 通览低级失误清单" }
+    ];
+
+    let state = { weeks: {}, logs: {}, bufferUsed: 0 };
+    try {
+      const raw = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
+      if (raw && typeof raw === "object") {
+        state = { weeks: raw.weeks || {}, logs: raw.logs || {}, bufferUsed: raw.bufferUsed || 0 };
+      }
+    } catch (e) {}
+
+    function saveState() {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+    }
+
+    function todayStr() {
+      const d = new Date();
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      return `${y}-${m}-${day}`;
+    }
+
+    function evalLog(log) {
+      if (log.shield) {
+        return { tier: "shield", label: "🛡️ 余量保签", xp: 15, excess: 0 };
+      }
+      const cfg = MODES[log.mode] || MODES["1a_normal"];
+      const val = cfg.metric === "new" ? log.newQ : (cfg.metric === "wrong" ? log.wrongQ : (log.newQ + log.wrongQ));
+      let tier = "none", label = "⚪ 未达保底", bonus = 0, excess = 0;
+      if (val >= cfg.over) {
+        tier = "over"; label = "🔥 超额暴击"; bonus = 20; excess = Math.max(0, val - cfg.should);
+      } else if (val >= cfg.should) {
+        tier = "should"; label = "🔵 标准达成"; bonus = 0; excess = Math.max(0, val - cfg.should);
+      } else if (val >= cfg.base) {
+        tier = "base"; label = "🟢 守住底线"; bonus = 0; excess = 0;
+      }
+      const xp = log.newQ * 10 + log.wrongQ * 15 + bonus;
+      return { tier, label, xp, excess };
+    }
+
+    function computeStats() {
+      const chMap = {};
+      CHAPTERS.forEach(c => { chMap[c.id] = c.init; });
+
+      let totalNew = 84;
+      let totalWrong = 0;
+      let totalHours = 0;
+      let totalXP = 840; // 初始已完成 84 题
+      let bufferEarned = 0;
+      let winterDays = 0;
+      const validDates = new Set();
+
+      Object.entries(state.logs).forEach(([date, log]) => {
+        const res = evalLog(log);
+        totalNew += (log.newQ || 0);
+        totalWrong += (log.wrongQ || 0);
+        totalHours += (log.hours || 0);
+        totalXP += res.xp;
+        bufferEarned += res.excess;
+
+        if (log.chapter && chMap[log.chapter] !== undefined) {
+          chMap[log.chapter] += (log.newQ || 0);
+        }
+        if (res.tier !== "none") {
+          validDates.add(date);
+          if (date >= "2027-01-18" && date <= "2027-02-21") winterDays++;
+        }
+      });
+
+      // Base book done (capped per chapter at chapter.total)
+      let r1Done = 0;
+      let clearedChapters = 0;
+      CHAPTERS.forEach(c => {
+        const done = Math.min(c.total, chMap[c.id]);
+        r1Done += done;
+        if (done >= c.total) clearedChapters++;
+      });
+
+      // Streaks
+      const sorted = Array.from(validDates).sort();
+      let maxStreak = 0, curRun = 0, prevDate = null;
+      sorted.forEach(ds => {
+        if (!prevDate) { curRun = 1; }
+        else {
+          const diff = Math.round((new Date(ds + "T00:00:00") - new Date(prevDate + "T00:00:00")) / 86400000);
+          curRun = (diff === 1) ? curRun + 1 : 1;
+        }
+        if (curRun > maxStreak) maxStreak = curRun;
+        prevDate = ds;
+      });
+
+      // Active streak up to today or yesterday
+      let activeStreak = 0;
+      const tStr = todayStr();
+      let probe = new Date(tStr + "T00:00:00");
+      if (!validDates.has(tStr)) {
+        probe.setDate(probe.getDate() - 1);
+      }
+      while (true) {
+        const pStr = `${probe.getFullYear()}-${String(probe.getMonth()+1).padStart(2,"0")}-${String(probe.getDate()).padStart(2,"0")}`;
+        if (validDates.has(pStr)) {
+          activeStreak++;
+          probe.setDate(probe.getDate() - 1);
+        } else break;
+      }
+
+      const bufferBalance = Math.max(0, bufferEarned - (state.bufferUsed || 0));
+      return { chMap, totalNew, totalWrong, totalHours, totalXP, r1Done, clearedChapters, activeStreak, maxStreak, bufferBalance, winterDays, validDaysCount: validDates.size };
+    }
+
+    function renderAll() {
+      const st = computeStats();
+
+      // Level & XP
+      let curLv = LEVELS[0], nextLv = LEVELS[1];
+      for (let i = 0; i < LEVELS.length; i++) {
+        if (st.totalXP >= LEVELS[i].xp) {
+          curLv = LEVELS[i];
+          nextLv = LEVELS[i + 1] || null;
+        }
+      }
+      document.getElementById("ui-level").textContent = `Lv.${curLv.lv} ${curLv.title}`;
+      document.getElementById("ui-xp-text").textContent = `当前经验：${st.totalXP} XP`;
+      if (nextLv) {
+        const pct = Math.min(100, Math.round(((st.totalXP - curLv.xp) / (nextLv.xp - curLv.xp)) * 100));
+        document.getElementById("ui-xp-bar").style.width = `${pct}%`;
+        document.getElementById("ui-xp-next").textContent = `距离 Lv.${nextLv.lv}「${nextLv.title}」还差 ${nextLv.xp - st.totalXP} XP`;
+      } else {
+        document.getElementById("ui-xp-bar").style.width = "100%";
+        document.getElementById("ui-xp-next").textContent = "已达最高段位！冲刺复旦 140+！";
+      }
+
+      // KPIs
+      const rem = Math.max(0, 845 - st.r1Done);
+      document.getElementById("kpi-r1-rem").textContent = rem === 0 ? "基础篇已通关！" : `还剩 ${rem} 题`;
+      document.getElementById("kpi-r1-pct").textContent = `已完成 ${st.r1Done} / 845（${((st.r1Done / 845) * 100).toFixed(1)}%）`;
+      document.getElementById("kpi-streak").textContent = `${st.activeStreak} 天`;
+      document.getElementById("kpi-max-streak").textContent = `历史最长：${st.maxStreak} 天（累计有效打卡 ${st.validDaysCount} 天）`;
+      document.getElementById("kpi-buffer").textContent = `${st.bufferBalance} 题`;
+      document.getElementById("kpi-wrong-hours").textContent = `${st.totalWrong} 题 / ${st.totalHours.toFixed(1)}h`;
+      document.getElementById("kpi-total-q").textContent = `累计全轮新题：${st.totalNew} 题`;
+
+      renderHeatmap();
+      renderChapters(st);
+      renderBadges(st);
+      renderLogsTable();
+      renderWeeks(document.querySelector(".filter-btn.active")?.getAttribute("data-filter") || "all");
+    }
+
+    function renderHeatmap() {
+      const grid = document.getElementById("hm-grid");
+      const monthsBar = document.getElementById("hm-months");
+      grid.innerHTML = "";
+      monthsBar.innerHTML = "";
+
+      const start = new Date("2026-11-16T00:00:00"); // Monday
+      const end = new Date("2027-12-19T00:00:00");   // Sunday
+      const tStr = todayStr();
+
+      let cur = new Date(start);
+      let weekIndex = 0;
+      let lastMonth = -1;
+
+      while (cur <= end) {
+        const y = cur.getFullYear();
+        const m = String(cur.getMonth() + 1).padStart(2, "0");
+        const d = String(cur.getDate()).padStart(2, "0");
+        const ds = `${y}-${m}-${d}`;
+
+        if (cur.getDay() === 1) {
+          const span = document.createElement("span");
+          span.style.width = "13px";
+          span.style.flexShrink = "0";
+          if (cur.getMonth() !== lastMonth) {
+            span.textContent = `${cur.getMonth() + 1}月`;
+            lastMonth = cur.getMonth();
+          }
+          monthsBar.appendChild(span);
+          weekIndex++;
+        }
+
+        const cell = document.createElement("div");
+        cell.className = "hm-cell";
+        if (ds === tStr) cell.classList.add("is-today");
+
+        const log = state.logs[ds];
+        if (log) {
+          const res = evalLog(log);
+          if (res.tier !== "none") cell.classList.add("t-" + res.tier);
+          cell.title = `${ds} | ${res.label}\n新题：${log.newQ} | 错题：${log.wrongQ} | 时长：${log.hours}h${log.note ? "\n备注：" + log.note : ""}`;
+        } else {
+          cell.title = `${ds} | 未记录（点击补录）`;
+        }
+        cell.onclick = () => loadDayIntoForm(ds);
+        grid.appendChild(cell);
+
+        cur.setDate(cur.getDate() + 1);
+      }
+    }
+
+    function renderChapters(st) {
+      const wrap = document.getElementById("chapter-grid");
+      wrap.innerHTML = "";
+      document.getElementById("ch-cleared-count").textContent = `已通关 ${st.clearedChapters} / 11 章`;
+
+      CHAPTERS.forEach(c => {
+        const rawDone = st.chMap[c.id] || 0;
+        const done = Math.min(c.total, rawDone);
+        const pct = Math.round((done / c.total) * 100);
+        const cleared = done >= c.total;
+
+        const div = document.createElement("div");
+        div.className = "ch-card" + (cleared ? " cleared" : "");
+        div.innerHTML = `
+          <div class="ch-head">
+            <span>${c.name}</span>
+            <span>${cleared ? "✅" : pct + "%"}</span>
+          </div>
+          <div class="ch-bar"><div class="ch-fill" style="width:${pct}%"></div></div>
+          <div class="ch-meta">
+            <span>已完成 ${done} / ${c.total} 题</span>
+            <span>${cleared ? "已通关" : "剩 " + (c.total - done) + " 题"}</span>
+          </div>
+        `;
+        wrap.appendChild(div);
+      });
+    }
+
+    function renderBadges(st) {
+      const ch1Done = (st.chMap["ch1"] || 0) >= 105;
+      const singleVarDone = ["ch1","ch2","ch3","ch4","ch5"].every(id => (st.chMap[id] || 0) >= CHAPTERS.find(c => c.id === id).total);
+      const hardChaptersDone = (st.chMap["ch9"] || 0) >= 90 && (st.chMap["ch10"] || 0) >= 97;
+
+      const list = [
+        { icon: "⚡", title: "首日开火", desc: "完成第 1 次每日战报打卡", ok: st.validDaysCount >= 1 },
+        { icon: "🏁", title: "首章通关", desc: "Ch1 函数极限连续 105/105 满格", ok: ch1Done },
+        { icon: "🔥", title: "7 天连胜", desc: "连续有效打卡达到 7 天", ok: st.maxStreak >= 7 },
+        { icon: "💎", title: "21 天铁军", desc: "连续有效打卡达到 21 天", ok: st.maxStreak >= 21 },
+        { icon: "🛡️", title: "错题百斩", desc: "累计闭卷重算错题 ≥ 100 道", ok: st.totalWrong >= 100 },
+        { icon: "⚔️", title: "一元微积分制霸", desc: "Ch1–Ch5 全部通关", ok: singleVarDone },
+        { icon: "❄️", title: "寒假幸存者", desc: "寒假 5 周内有效打卡 ≥ 20 天", ok: st.winterDays >= 20 },
+        { icon: "👑", title: "500 题里程碑", desc: "高数基础篇累计突破 500 题", ok: st.r1Done >= 500 },
+        { icon: "🐉", title: "线面与级数征服者", desc: "Ch9 与 Ch10 全部通关", ok: hardChaptersDone },
+        { icon: "🏆", title: "基础篇大满贯", desc: "1800 高数基础篇 845 题全通关", ok: st.r1Done >= 845 }
+      ];
+
+      const wrap = document.getElementById("badge-grid");
+      wrap.innerHTML = "";
+      let unlocked = 0;
+      list.forEach(b => {
+        if (b.ok) unlocked++;
+        const div = document.createElement("div");
+        div.className = "ach-card" + (b.ok ? " unlocked" : "");
+        div.innerHTML = `
+          <div class="ach-icon">${b.icon}</div>
+          <div class="ach-title">${b.title}</div>
+          <div class="ach-desc">${b.desc}</div>
+        `;
+        wrap.appendChild(div);
+      });
+      document.getElementById("badge-count").textContent = `已解锁 ${unlocked} / ${list.length} 枚`;
+    }
+
+    function renderLogsTable() {
+      const tbody = document.getElementById("logs-tbody");
+      tbody.innerHTML = "";
+      const keys = Object.keys(state.logs).sort().reverse().slice(0, 15);
+      if (keys.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:18px;">暂无打卡记录，在上方输入今天的题量提交你的第一份战报吧！</td></tr>`;
+        return;
+      }
+      keys.forEach(date => {
+        const log = state.logs[date];
+        const res = evalLog(log);
+        const modeName = log.shield ? "余量保签" : (MODES[log.mode]?.label || log.mode);
+        const chName = CHAPTERS.find(c => c.id === log.chapter)?.name || "其他/综合";
+        let tagCls = "tag-blue";
+        if (res.tier === "over") tagCls = "tag-amber";
+        else if (res.tier === "base" || res.tier === "should") tagCls = "tag-green";
+        else if (res.tier === "none") tagCls = "tag-red";
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><strong>${date}</strong></td>
+          <td><span class="tag ${tagCls}">${res.label}</span></td>
+          <td>${modeName}<br><span style="font-size:11px;color:var(--muted);">${chName}</span></td>
+          <td>新 ${log.newQ} / 错 ${log.wrongQ}</td>
+          <td>${log.hours}h</td>
+          <td>+${res.xp} XP${res.excess > 0 ? ` · <span style="color:var(--amber);font-weight:700;">+${res.excess} 余量</span>` : ""}</td>
+          <td style="color:var(--muted);">${log.note || "—"}</td>
+          <td>
+            <button class="btn-outline" style="padding:3px 7px;" onclick="loadDayIntoForm('${date}')">编辑</button>
+            <button class="btn-outline" style="padding:3px 7px;color:var(--red);" onclick="deleteLog('${date}')">删</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function updateQuotaPreview() {
+      const modeKey = document.getElementById("log-mode").value;
+      const cfg = MODES[modeKey];
+      const box = document.getElementById("quota-preview");
+      box.innerHTML = `
+        <strong>当前模式标尺（${cfg.label}）：</strong>
+        <span class="tag tag-green">🟢 保底：${cfg.base} ${cfg.unit}</span>
+        <span class="tag tag-blue">🔵 应该：${cfg.should} ${cfg.unit}</span>
+        <span class="tag tag-amber">🔥 超额暴击：${cfg.over}+ ${cfg.unit}（超出「应该」的题数自动存入余量银行）</span>
+      `;
+    }
+
+    function loadDayIntoForm(ds) {
+      document.getElementById("log-date").value = ds;
+      const log = state.logs[ds];
+      if (log && !log.shield) {
+        document.getElementById("log-mode").value = log.mode || "1a_normal";
+        document.getElementById("log-chapter").value = log.chapter || "ch1";
+        document.getElementById("log-new").value = log.newQ || 0;
+        document.getElementById("log-wrong").value = log.wrongQ || 0;
+        document.getElementById("log-hours").value = log.hours || 0;
+        document.getElementById("log-note").value = log.note || "";
+      } else {
+        document.getElementById("log-note").value = "";
+      }
+      updateQuotaPreview();
+      document.getElementById("logger-card").scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function submitDailyLog() {
+      const date = document.getElementById("log-date").value;
+      if (!date) return alert("请选择打卡日期");
+      const mode = document.getElementById("log-mode").value;
+      const chapter = document.getElementById("log-chapter").value;
+      const newQ = Math.max(0, parseInt(document.getElementById("log-new").value || "0", 10));
+      const wrongQ = Math.max(0, parseInt(document.getElementById("log-wrong").value || "0", 10));
+      const hours = Math.max(0, parseFloat(document.getElementById("log-hours").value || "0"));
+      const note = document.getElementById("log-note").value.trim();
+
+      if (newQ === 0 && wrongQ === 0 && hours === 0) {
+        return alert("请至少输入新题数、错题数或时长");
+      }
+
+      const log = { mode, chapter, newQ, wrongQ, hours, note, shield: false };
+      state.logs[date] = log;
+      saveState();
+
+      const res = evalLog(log);
+      renderAll();
+      showToast(
+        `${date} 战报已记录：${res.label}`,
+        `获得 +${res.xp} XP${res.excess > 0 ? `，超额 +${res.excess} 题已存入余量银行！` : "。继续推进！"}`
+      );
+    }
+
+    function useBufferShield() {
+      const st = computeStats();
+      const date = document.getElementById("log-date").value || todayStr();
+      if (st.bufferBalance < 3) {
+        return alert(`余量银行不足！当前余额 ${st.bufferBalance} 题，保签需消耗 3 题（平时超额完成会自动累积）。`);
+      }
+      if (!confirm(`确定消耗 3 题余量，将 ${date} 标记为「余量保签日」以保住连胜吗？`)) return;
+      state.bufferUsed = (state.bufferUsed || 0) + 3;
+      state.logs[date] = { mode: "shield", chapter: "other", newQ: 0, wrongQ: 0, hours: 0, note: "使用余量银行保签", shield: true };
+      saveState();
+      renderAll();
+      showToast(`🛡️ ${date} 保签成功！`, `已消耗 3 题余量，连胜已保护。`);
+    }
+
+    function deleteLog(date) {
+      if (!confirm(`删除 ${date} 的打卡记录？`)) return;
+      if (state.logs[date]?.shield) {
+        state.bufferUsed = Math.max(0, (state.bufferUsed || 0) - 3);
+      }
+      delete state.logs[date];
+      saveState();
+      renderAll();
+    }
+
+    function clearAllLogs() {
+      if (!confirm("确定清空所有每日打卡记录？建议先点击顶部「导出 JSON 备份」。")) return;
+      state.logs = {};
+      state.bufferUsed = 0;
+      saveState();
+      renderAll();
+    }
+
+    function showToast(title, sub) {
+      const el = document.getElementById("toast");
+      el.innerHTML = `<div style="font-weight:800;margin-bottom:3px;">${title}</div><div style="opacity:0.88;">${sub}</div>`;
+      el.style.display = "block";
+      clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(() => { el.style.display = "none"; }, 3600);
+    }
+
+    // Weeks Checklist
+    function renderWeeks(filter = "all") {
+      const tbody = document.getElementById("weeks-tbody");
+      tbody.innerHTML = "";
+      WEEKS_DATA.forEach(item => {
+        if (filter !== "all" && !item.round.split(" ").includes(filter)) return;
+        const checked = !!state.weeks[item.id];
+        const tr = document.createElement("tr");
+        if (checked) tr.className = "done-row";
+        let tagClass = "tag-blue";
+        if (item.round.includes("winter")) tagClass = "tag-amber";
+        else if (item.round.includes("r2")) tagClass = "tag-purple";
+        else if (item.round.includes("r3")) tagClass = "tag-red";
+        else if (item.round.includes("r4")) tagClass = "tag-green";
+
+        tr.innerHTML = `
+          <td style="text-align:center;"><input type="checkbox" class="week-check" ${checked ? "checked" : ""} onchange="toggleWeek('${item.id}', this.checked)"></td>
+          <td><span class="tag ${tagClass}">${item.tag}</span></td>
+          <td><strong>${item.id}</strong><br><span style="color:var(--muted);font-size:12px;">${item.date}</span></td>
+          <td>${item.task}</td>
+          <td>${item.load}</td>
+          <td style="color:var(--muted);">${item.review}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function toggleWeek(id, isChecked) {
+      if (isChecked) state.weeks[id] = true;
+      else delete state.weeks[id];
+      saveState();
+      renderWeeks(document.querySelector(".filter-btn.active")?.getAttribute("data-filter") || "all");
+    }
+
+    function filterWeeks(filter, btn) {
+      document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      renderWeeks(filter);
+    }
+
+    function resetWeeks() {
+      if (!confirm("确定清空所有已勾选的周次进度吗？")) return;
+      state.weeks = {};
+      saveState();
+      renderWeeks(document.querySelector(".filter-btn.active")?.getAttribute("data-filter") || "all");
+    }
+
+    function switchTab(name, btn) {
+      document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
+      document.getElementById("tab-" + name).classList.add("active");
+    }
+
+    // Export / Import Backup
+    function exportBackup() {
+      const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `高数备考进度备份_${todayStr()}.json`;
+      a.click();
+    }
+
+    function importBackup(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        try {
+          const parsed = JSON.parse(e.target.result);
+          if (parsed && typeof parsed === "object") {
+            state = { weeks: parsed.weeks || {}, logs: parsed.logs || {}, bufferUsed: parsed.bufferUsed || 0 };
+            saveState();
+            renderAll();
+            showToast("✅ 备份导入成功", "全部打卡记录与进度已恢复。");
+          }
+        } catch (err) {
+          alert("备份文件格式无效");
+        }
+      };
+      reader.readAsText(file);
+      event.target.value = "";
+    }
+
+    // Init
+    document.getElementById("log-date").value = todayStr();
+    updateQuotaPreview();
+    renderAll();
+  </script>
+</body>
+</html>
