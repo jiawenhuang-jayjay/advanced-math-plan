@@ -1,0 +1,5 @@
+/.wrangler/
+/V1/__pycache__/
+/V1/*.pdf
+/V1/question_bank.json
+/V1/question_bank_cache/
