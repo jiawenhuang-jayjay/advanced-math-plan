@@ -7,7 +7,9 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   <meta name="apple-mobile-web-app-title" content="高数战报" />
   <meta name="theme-color" content="#0f172a" />
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'%3E%3Crect width='128' height='128' rx='28' fill='%231e3a8a'/%3E%3Ctext x='64' y='78' text-anchor='middle' font-size='56' font-weight='bold' fill='%23fbbf24' font-family='sans-serif'%3E%E2%88%AB%3C/text%3E%3C/svg%3E" />
+  <link rel="manifest" href="./manifest.json" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="180x180" href="./apple-touch-icon.png" />
   <title>28考研数学一 · 高数四轮规划与每日战报系统</title>
   <style>
     :root {
@@ -511,6 +513,88 @@
     .filter-btn.active { background: var(--text); color: #fff; border-color: var(--text); }
     input[type="checkbox"].week-check { width: 17px; height: 17px; cursor: pointer; accent-color: var(--green); }
 
+    /* Question Bank Cards */
+    .qb-filters {
+      display: grid;
+      grid-template-columns: 180px 1fr auto auto;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .qb-filters select, .qb-filters input {
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 13px;
+      background: #fff;
+      color: var(--text);
+    }
+    .qb-card {
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      padding: 14px 15px;
+      background: #fff;
+      margin-bottom: 11px;
+      box-shadow: 0 1px 4px rgba(15, 23, 42, 0.04);
+    }
+    .qb-card.is-starred {
+      border-color: #f59e0b;
+      background: #fffdf5;
+    }
+    .qb-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 12px;
+    }
+    .qb-stem {
+      font-size: 14px;
+      line-height: 1.75;
+      white-space: pre-wrap;
+      overflow-x: auto;
+      padding: 2px 0 8px;
+    }
+    .qb-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px;
+    }
+    .qb-btn {
+      border: 1px solid var(--border);
+      background: var(--surface-alt);
+      color: var(--text);
+      padding: 6px 11px;
+      border-radius: 7px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .qb-btn:hover { border-color: var(--primary); color: var(--primary); }
+    .qb-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+    .qb-btn.star-on { background: var(--amber-soft); color: #92400e; border-color: #f59e0b; }
+    .qb-box {
+      display: none;
+      margin-top: 8px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      line-height: 1.65;
+      overflow-x: auto;
+    }
+    .qb-box.show { display: block; }
+    .qb-box.hint { background: #eff6ff; border-left: 3px solid var(--primary); }
+    .qb-box.formula { background: #fefce8; border-left: 3px solid var(--amber); }
+    .qb-box.ans { background: #ecfdf5; border-left: 3px solid var(--green); }
+    @media (max-width: 640px) {
+      .qb-filters { grid-template-columns: 1fr 1fr; }
+      .qb-filters input { grid-column: 1 / -1; font-size: 16px; min-height: 42px; }
+      .qb-filters select { grid-column: 1 / -1; font-size: 16px; min-height: 42px; }
+      .qb-btn { min-height: 36px; flex: 1 1 auto; text-align: center; }
+    }
+
     /* iPhone / Mobile Standalone Web App Optimization */
     body {
       -webkit-tap-highlight-color: transparent;
@@ -581,7 +665,7 @@
       <div class="hero-top">
         <div>
           <h1>28 考研数学一 · 高数四轮规划与每日战报系统</h1>
-          <p class="hero-sub">复旦大学（学硕）· 408 专业课 · 数学一目标 140+ · 《2026 接力题典 1800·数一》高数基础篇（845 题，初始已完 84 题）</p>
+          <p class="hero-sub">复旦大学（学硕）· 408 专业课 · 数学一目标 140+ · 《2026 接力题典 1800·数一》高数基础篇（全章 846 题 = 入门 214 + 基础 632，Ch1 已全通关）</p>
         </div>
         <div class="hero-actions">
           <button class="hero-btn" onclick="exportBackup()">导出 JSON 备份</button>
@@ -596,8 +680,8 @@
         <div class="level-badge" id="ui-level">Lv.1 极限入门</div>
         <div class="xp-wrap">
           <div class="xp-meta">
-            <span id="ui-xp-text">当前经验：840 XP</span>
-            <span id="ui-xp-next">距离下一级还差 160 XP（新题+10 / 错题重算+15 / 超额+20）</span>
+            <span id="ui-xp-text">当前经验：1050 XP</span>
+            <span id="ui-xp-next">距离下一级还差 150 XP（新题+10 / 错题重算+15 / 超额+20）</span>
           </div>
           <div class="progress-bar"><div class="progress-fill" id="ui-xp-bar"></div></div>
         </div>
@@ -606,9 +690,9 @@
       <!-- KPIs -->
       <div class="kpi-grid">
         <div class="kpi-card">
-          <div class="kpi-label">基础篇剩余倒计时（845 题）</div>
-          <div class="kpi-value" id="kpi-r1-rem">还剩 761 题</div>
-          <div class="kpi-foot" id="kpi-r1-pct">已完成 84 / 845（9.9%）</div>
+          <div class="kpi-label" id="kpi-r1-title">基础篇剩余倒计时（846 题）</div>
+          <div class="kpi-value" id="kpi-r1-rem">还剩 741 题</div>
+          <div class="kpi-foot" id="kpi-r1-pct">已完成 105 / 846（12.4%）</div>
         </div>
         <div class="kpi-card">
           <div class="kpi-label">当前连胜 / 最长连胜</div>
@@ -631,6 +715,7 @@
     <!-- Navigation -->
     <div class="nav-tabs">
       <button class="tab-btn active" onclick="switchTab('dashboard', this)">🔥 每日战报 &amp; 成就看板</button>
+      <button class="tab-btn" onclick="switchTab('qbank', this)">📚 1800 电子题库 &amp; 提示</button>
       <button class="tab-btn" onclick="switchTab('quotas', this)">1. 每日三档题量 &amp; 四轮总览</button>
       <button class="tab-btn" onclick="switchTab('weekly', this)">2. 逐周清单 (W1–W56.5)</button>
       <button class="tab-btn" onclick="switchTab('schedule', this)">3. 每周固定时间表</button>
@@ -685,17 +770,17 @@
           <div class="field field-full">
             <label>主攻章节（自动点亮章节地图）</label>
             <select id="log-chapter">
-              <option value="ch1">Ch1 函数、极限、连续 (剩21题起步)</option>
-              <option value="ch2">Ch2 导数与微分 (67题)</option>
-              <option value="ch3">Ch3 中值定理与微分应用 (71题)</option>
-              <option value="ch4">Ch4 不定积分 (60题)</option>
-              <option value="ch5">Ch5 定积分及应用 (110题)</option>
-              <option value="ch6">Ch6 多元函数微分学 (70题)</option>
-              <option value="ch7">Ch7 微分方程 (68题)</option>
-              <option value="ch8">Ch8 二重积分 (66题)</option>
-              <option value="ch9">Ch9 三重与曲线曲面积分 (90题)</option>
-              <option value="ch10">Ch10 无穷级数 (97题)</option>
-              <option value="ch11">Ch11 向量代数与空间几何 (41题)</option>
+              <option value="ch1">Ch1 函数、极限、连续 (105题 · 已通关)</option>
+              <option value="ch2" selected>Ch2 导数与微分 (68题 = 入门22+基础46)</option>
+              <option value="ch3">Ch3 中值定理与微分应用 (72题 = 入门20+基础52)</option>
+              <option value="ch4">Ch4 不定积分 (60题 = 入门20+基础40)</option>
+              <option value="ch5">Ch5 定积分及应用 (110题 = 入门20+基础90)</option>
+              <option value="ch6">Ch6 多元函数微分学 (71题 = 入门20+基础51)</option>
+              <option value="ch7">Ch7 微分方程 (71题 = 入门20+基础51)</option>
+              <option value="ch8">Ch8 二重积分 (66题 = 入门20+基础46)</option>
+              <option value="ch9">Ch9 三重与曲线曲面积分 (90题 = 入门20+基础70)</option>
+              <option value="ch10">Ch10 无穷级数 (92题 = 入门16+基础76)</option>
+              <option value="ch11">Ch11 向量代数与空间几何 (41题 = 入门16+基础25)</option>
               <option value="other">其他（二轮强化 / 真题 / 模拟 / 跨章混刷）</option>
             </select>
           </div>
@@ -749,8 +834,14 @@
       <!-- 11 Chapters Map -->
       <div class="card">
         <h2>
-          <span>《1800·高数基础篇》11 章通关地图（满格自动盖章通关）</span>
-          <span style="font-size:12px;font-weight:400;color:var(--muted);" id="ch-cleared-count">已通关 0 / 11 章</span>
+          <span>《1800·高数基础篇》11 章通关地图（支持单章校准）</span>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <select id="ch-mode-select" onchange="switchChapterMode(this.value)" style="font-size:12px;padding:4px 8px;border:1px solid var(--border);border-radius:6px;background:#fff;color:var(--text);">
+              <option value="all">口径：全章（入门+基础 = 846题）</option>
+              <option value="base">口径：仅基础精练（不含入门 = 632题）</option>
+            </select>
+            <span style="font-size:12px;font-weight:400;color:var(--muted);" id="ch-cleared-count">已通关 1 / 11 章</span>
+          </div>
         </h2>
         <div class="chapter-grid" id="chapter-grid"></div>
       </div>
@@ -1229,8 +1320,51 @@
         </div>
       </div>
     </div>
+    <!-- TAB: 1800 Question Bank & Hints -->
+    <div id="tab-qbank" class="section">
+      <div class="card">
+        <h2>
+          <span>📚 《1800·高数基础篇》电子题库 &amp; 卡壳提示</span>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <span style="font-size:12px;font-weight:400;color:var(--muted);" id="qb-stats">未加载题库</span>
+            <button class="btn-outline" onclick="document.getElementById('qb-import-file').click()">手动导入 question_bank.json</button>
+            <input type="file" id="qb-import-file" accept=".json" style="display:none" onchange="importQBankJson(event)" />
+          </div>
+        </h2>
+
+        <div class="qb-filters">
+          <select id="qb-chapter" onchange="renderQBank(true)">
+            <option value="all">全部章节 (Ch1–Ch11)</option>
+            <option value="ch1">Ch1 函数、极限、连续</option>
+            <option value="ch2">Ch2 导数与微分</option>
+            <option value="ch3">Ch3 中值定理与微分应用</option>
+            <option value="ch4">Ch4 不定积分</option>
+            <option value="ch5">Ch5 定积分及应用</option>
+            <option value="ch6">Ch6 多元函数微分学</option>
+            <option value="ch7">Ch7 微分方程</option>
+            <option value="ch8">Ch8 二重积分</option>
+            <option value="ch9">Ch9 三重与曲线曲面积分</option>
+            <option value="ch10">Ch10 无穷级数</option>
+            <option value="ch11">Ch11 向量代数与空间几何</option>
+          </select>
+          <input type="text" id="qb-search" placeholder="搜索题号、页码(如 P12)、考点或关键词..." oninput="renderQBank(true)" />
+          <label style="font-size:12px;display:flex;align-items:center;gap:4px;white-space:nowrap;cursor:pointer;">
+            <input type="checkbox" id="qb-only-key" onchange="renderQBank(true)" /> 仅重点题
+          </label>
+          <label style="font-size:12px;display:flex;align-items:center;gap:4px;white-space:nowrap;cursor:pointer;">
+            <input type="checkbox" id="qb-only-star" onchange="renderQBank(true)" /> 仅错题收藏
+          </label>
+        </div>
+
+        <div id="qb-list"></div>
+        <div style="text-align:center;margin-top:12px;">
+          <button class="btn-outline" id="qb-more-btn" style="display:none;" onclick="loadMoreQBank()">加载更多题目</button>
+        </div>
+      </div>
+    </div>
   </div>
 
+  <script async src="./question_bank.js" onload="if(typeof renderQBank==='function') renderQBank(false);" onerror="window.QUESTION_BANK=window.QUESTION_BANK||[]"></script>
   <script>
     const STORAGE_KEY = "postgrad_math_v2_state";
 
@@ -1253,17 +1387,17 @@
     };
 
     const CHAPTERS = [
-      { id: "ch1",  name: "Ch1 函数、极限、连续",     total: 105, init: 84 },
-      { id: "ch2",  name: "Ch2 导数与微分",           total: 67,  init: 0 },
-      { id: "ch3",  name: "Ch3 中值定理与微分应用",   total: 71,  init: 0 },
-      { id: "ch4",  name: "Ch4 不定积分",             total: 60,  init: 0 },
-      { id: "ch5",  name: "Ch5 定积分及应用",         total: 110, init: 0 },
-      { id: "ch6",  name: "Ch6 多元函数微分学",       total: 70,  init: 0 },
-      { id: "ch7",  name: "Ch7 微分方程",             total: 68,  init: 0 },
-      { id: "ch8",  name: "Ch8 二重积分",             total: 66,  init: 0 },
-      { id: "ch9",  name: "Ch9 三重与曲线曲面积分",   total: 90,  init: 0 },
-      { id: "ch10", name: "Ch10 无穷级数",            total: 97,  init: 0 },
-      { id: "ch11", name: "Ch11 向量代数与空间几何",  total: 41,  init: 0 }
+      { id: "ch1",  name: "Ch1 函数、极限、连续",     intro: 20, base: 85, total: 105, init: 105, initBase: 85 },
+      { id: "ch2",  name: "Ch2 导数与微分",           intro: 22, base: 46, total: 68,  init: 0,   initBase: 0 },
+      { id: "ch3",  name: "Ch3 中值定理与微分应用",   intro: 20, base: 52, total: 72,  init: 0,   initBase: 0 },
+      { id: "ch4",  name: "Ch4 不定积分",             intro: 20, base: 40, total: 60,  init: 0,   initBase: 0 },
+      { id: "ch5",  name: "Ch5 定积分及应用",         intro: 20, base: 90, total: 110, init: 0,   initBase: 0 },
+      { id: "ch6",  name: "Ch6 多元函数微分学",       intro: 20, base: 51, total: 71,  init: 0,   initBase: 0 },
+      { id: "ch7",  name: "Ch7 微分方程",             intro: 20, base: 51, total: 71,  init: 0,   initBase: 0 },
+      { id: "ch8",  name: "Ch8 二重积分",             intro: 20, base: 46, total: 66,  init: 0,   initBase: 0 },
+      { id: "ch9",  name: "Ch9 三重与曲线曲面积分",   intro: 20, base: 70, total: 90,  init: 0,   initBase: 0 },
+      { id: "ch10", name: "Ch10 无穷级数",            intro: 16, base: 76, total: 92,  init: 0,   initBase: 0 },
+      { id: "ch11", name: "Ch11 向量代数与空间几何",  intro: 16, base: 25, total: 41,  init: 0,   initBase: 0 }
     ];
 
     const LEVELS = [
@@ -1316,13 +1450,32 @@
       { id: "W55–56.5", round: "r4", tag: "考前定型", date: "12.06–12.18", task: "停新偏难卷；每日 8:30–10:30 选填+2常规大题热身", load: "13h/周", review: "闭卷默写 11 章公式 + 通览低级失误清单" }
     ];
 
-    let state = { weeks: {}, logs: {}, bufferUsed: 0 };
+    let state = { weeks: {}, logs: {}, bufferUsed: 0, starred: {}, chMode: "all", chOverrides: {} };
     try {
       const raw = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
       if (raw && typeof raw === "object") {
-        state = { weeks: raw.weeks || {}, logs: raw.logs || {}, bufferUsed: raw.bufferUsed || 0 };
+        state = {
+          weeks: raw.weeks || {},
+          logs: raw.logs || {},
+          bufferUsed: raw.bufferUsed || 0,
+          starred: raw.starred || {},
+          chMode: raw.chMode || "all",
+          chOverrides: raw.chOverrides || {}
+        };
       }
     } catch (e) {}
+
+    function getChapterTotal(c) {
+      const ov = state.chOverrides && state.chOverrides[c.id];
+      if (ov && typeof ov.total === "number" && ov.total > 0) return ov.total;
+      return state.chMode === "base" ? c.base : c.total;
+    }
+
+    function getChapterInit(c) {
+      const ov = state.chOverrides && state.chOverrides[c.id];
+      if (ov && typeof ov.init === "number" && ov.init >= 0) return ov.init;
+      return state.chMode === "base" ? c.initBase : c.init;
+    }
 
     function saveState() {
       try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
@@ -1356,12 +1509,22 @@
 
     function computeStats() {
       const chMap = {};
-      CHAPTERS.forEach(c => { chMap[c.id] = c.init; });
+      const chTotals = {};
+      let initSum = 0;
+      let r1Total = 0;
+      CHAPTERS.forEach(c => {
+        const ini = getChapterInit(c);
+        const tot = getChapterTotal(c);
+        chMap[c.id] = ini;
+        chTotals[c.id] = tot;
+        initSum += ini;
+        r1Total += tot;
+      });
 
-      let totalNew = 84;
+      let totalNew = initSum;
       let totalWrong = 0;
       let totalHours = 0;
-      let totalXP = 840; // 初始已完成 84 题
+      let totalXP = initSum * 10;
       let bufferEarned = 0;
       let winterDays = 0;
       const validDates = new Set();
@@ -1383,13 +1546,14 @@
         }
       });
 
-      // Base book done (capped per chapter at chapter.total)
+      // Base book done (capped per chapter at effective chapter total)
       let r1Done = 0;
       let clearedChapters = 0;
       CHAPTERS.forEach(c => {
-        const done = Math.min(c.total, chMap[c.id]);
+        const tot = chTotals[c.id];
+        const done = Math.min(tot, chMap[c.id]);
         r1Done += done;
-        if (done >= c.total) clearedChapters++;
+        if (done >= tot) clearedChapters++;
       });
 
       // Streaks
@@ -1421,11 +1585,13 @@
       }
 
       const bufferBalance = Math.max(0, bufferEarned - (state.bufferUsed || 0));
-      return { chMap, totalNew, totalWrong, totalHours, totalXP, r1Done, clearedChapters, activeStreak, maxStreak, bufferBalance, winterDays, validDaysCount: validDates.size };
+      return { chMap, chTotals, r1Total, totalNew, totalWrong, totalHours, totalXP, r1Done, clearedChapters, activeStreak, maxStreak, bufferBalance, winterDays, validDaysCount: validDates.size };
     }
 
     function renderAll() {
       const st = computeStats();
+      const modeSel = document.getElementById("ch-mode-select");
+      if (modeSel) modeSel.value = state.chMode || "all";
 
       // Level & XP
       let curLv = LEVELS[0], nextLv = LEVELS[1];
@@ -1447,9 +1613,11 @@
       }
 
       // KPIs
-      const rem = Math.max(0, 845 - st.r1Done);
+      const rem = Math.max(0, st.r1Total - st.r1Done);
+      const r1TitleEl = document.getElementById("kpi-r1-title");
+      if (r1TitleEl) r1TitleEl.textContent = `基础篇剩余倒计时（${st.r1Total} 题）`;
       document.getElementById("kpi-r1-rem").textContent = rem === 0 ? "基础篇已通关！" : `还剩 ${rem} 题`;
-      document.getElementById("kpi-r1-pct").textContent = `已完成 ${st.r1Done} / 845（${((st.r1Done / 845) * 100).toFixed(1)}%）`;
+      document.getElementById("kpi-r1-pct").textContent = `已完成 ${st.r1Done} / ${st.r1Total}（${((st.r1Done / Math.max(1, st.r1Total)) * 100).toFixed(1)}%）`;
       document.getElementById("kpi-streak").textContent = `${st.activeStreak} 天`;
       document.getElementById("kpi-max-streak").textContent = `历史最长：${st.maxStreak} 天（累计有效打卡 ${st.validDaysCount} 天）`;
       document.getElementById("kpi-buffer").textContent = `${st.bufferBalance} 题`;
@@ -1520,10 +1688,12 @@
       document.getElementById("ch-cleared-count").textContent = `已通关 ${st.clearedChapters} / 11 章`;
 
       CHAPTERS.forEach(c => {
+        const tot = st.chTotals[c.id];
         const rawDone = st.chMap[c.id] || 0;
-        const done = Math.min(c.total, rawDone);
-        const pct = Math.round((done / c.total) * 100);
-        const cleared = done >= c.total;
+        const done = Math.min(tot, rawDone);
+        const pct = Math.round((done / Math.max(1, tot)) * 100);
+        const cleared = done >= tot;
+        const hasCustom = !!(state.chOverrides && state.chOverrides[c.id]);
 
         const div = document.createElement("div");
         div.className = "ch-card" + (cleared ? " cleared" : "");
@@ -1534,22 +1704,58 @@
           </div>
           <div class="ch-bar"><div class="ch-fill" style="width:${pct}%"></div></div>
           <div class="ch-meta">
-            <span>已完成 ${done} / ${c.total} 题</span>
-            <span>${cleared ? "已通关" : "剩 " + (c.total - done) + " 题"}</span>
+            <span>已完成 ${done} / ${tot} 题</span>
+            <span>${cleared ? "已通关" : "剩 " + (tot - done) + " 题"}</span>
+          </div>
+          <div class="ch-meta" style="margin-top:4px;align-items:center;">
+            <span style="font-size:10px;opacity:0.85;">${hasCustom ? "已自定义校准" : `入门${c.intro} + 基础${c.base}`}</span>
+            <button type="button" onclick="editChapterOverride('${c.id}')" style="border:none;background:transparent;color:var(--primary);font-size:11px;cursor:pointer;padding:0;font-weight:600;">✏️ 校准</button>
           </div>
         `;
         wrap.appendChild(div);
       });
     }
 
+    function switchChapterMode(mode) {
+      state.chMode = mode === "base" ? "base" : "all";
+      saveState();
+      renderAll();
+    }
+
+    function editChapterOverride(chId) {
+      const c = CHAPTERS.find(x => x.id === chId);
+      if (!c) return;
+      const st = computeStats();
+      const curTot = st.chTotals[chId];
+      const loggedForCh = Object.values(state.logs).reduce((acc, log) => acc + (log.chapter === chId ? (log.newQ || 0) : 0), 0);
+      const curDone = Math.min(curTot, st.chMap[chId] || 0);
+
+      const totStr = prompt(`【${c.name}】请输入该章总题数（原书实测：入门 ${c.intro} + 基础 ${c.base} = ${c.total} 题；留空取消）：`, String(curTot));
+      if (totStr === null) return;
+      const newTot = parseInt(totStr.trim(), 10);
+      if (!Number.isFinite(newTot) || newTot <= 0) return alert("请输入大于 0 的整数");
+
+      const doneStr = prompt(`【${c.name}】请输入你目前实际已完成的题数（0 ~ ${newTot}，已自动计入历史打卡 ${loggedForCh} 题）：`, String(curDone));
+      if (doneStr === null) return;
+      const newDone = parseInt(doneStr.trim(), 10);
+      if (!Number.isFinite(newDone) || newDone < 0) return alert("请输入大于等于 0 的整数");
+
+      state.chOverrides = state.chOverrides || {};
+      state.chOverrides[chId] = { total: newTot, init: Math.max(0, newDone - loggedForCh) };
+      saveState();
+      renderAll();
+      showToast(`✅ ${c.name} 已校准`, `进度已更新为 ${Math.min(newTot, newDone)} / ${newTot} 题。`);
+    }
+
     function renderBadges(st) {
-      const ch1Done = (st.chMap["ch1"] || 0) >= 105;
-      const singleVarDone = ["ch1","ch2","ch3","ch4","ch5"].every(id => (st.chMap[id] || 0) >= CHAPTERS.find(c => c.id === id).total);
-      const hardChaptersDone = (st.chMap["ch9"] || 0) >= 90 && (st.chMap["ch10"] || 0) >= 97;
+      const isCleared = id => (st.chMap[id] || 0) >= st.chTotals[id];
+      const ch1Done = isCleared("ch1");
+      const singleVarDone = ["ch1","ch2","ch3","ch4","ch5"].every(isCleared);
+      const hardChaptersDone = isCleared("ch9") && isCleared("ch10");
 
       const list = [
         { icon: "⚡", title: "首日开火", desc: "完成第 1 次每日战报打卡", ok: st.validDaysCount >= 1 },
-        { icon: "🏁", title: "首章通关", desc: "Ch1 函数极限连续 105/105 满格", ok: ch1Done },
+        { icon: "🏁", title: "首章通关", desc: `Ch1 函数极限连续 ${st.chTotals.ch1}/${st.chTotals.ch1} 满格`, ok: ch1Done },
         { icon: "🔥", title: "7 天连胜", desc: "连续有效打卡达到 7 天", ok: st.maxStreak >= 7 },
         { icon: "💎", title: "21 天铁军", desc: "连续有效打卡达到 21 天", ok: st.maxStreak >= 21 },
         { icon: "🛡️", title: "错题百斩", desc: "累计闭卷重算错题 ≥ 100 道", ok: st.totalWrong >= 100 },
@@ -1557,7 +1763,7 @@
         { icon: "❄️", title: "寒假幸存者", desc: "寒假 5 周内有效打卡 ≥ 20 天", ok: st.winterDays >= 20 },
         { icon: "👑", title: "500 题里程碑", desc: "高数基础篇累计突破 500 题", ok: st.r1Done >= 500 },
         { icon: "🐉", title: "线面与级数征服者", desc: "Ch9 与 Ch10 全部通关", ok: hardChaptersDone },
-        { icon: "🏆", title: "基础篇大满贯", desc: "1800 高数基础篇 845 题全通关", ok: st.r1Done >= 845 }
+        { icon: "🏆", title: "基础篇大满贯", desc: `1800 高数基础篇 ${st.r1Total} 题全通关`, ok: st.r1Done >= st.r1Total }
       ];
 
       const wrap = document.getElementById("badge-grid");
@@ -1755,11 +1961,35 @@
       renderWeeks(document.querySelector(".filter-btn.active")?.getAttribute("data-filter") || "all");
     }
 
+    let katexRequested = false;
+    function loadKatexOnce() {
+      if (katexRequested) return;
+      katexRequested = true;
+      const css = document.createElement("link");
+      css.rel = "stylesheet";
+      css.href = "https://cdn.staticfile.net/KaTeX/0.16.9/katex.min.css";
+      document.head.appendChild(css);
+
+      const s1 = document.createElement("script");
+      s1.src = "https://cdn.staticfile.net/KaTeX/0.16.9/katex.min.js";
+      s1.onload = () => {
+        const s2 = document.createElement("script");
+        s2.src = "https://cdn.staticfile.net/KaTeX/0.16.9/contrib/auto-render.min.js";
+        s2.onload = () => renderQBank(false);
+        document.head.appendChild(s2);
+      };
+      document.head.appendChild(s1);
+    }
+
     function switchTab(name, btn) {
       document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
       btn.classList.add("active");
       document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
       document.getElementById("tab-" + name).classList.add("active");
+      if (name === "qbank") {
+        loadKatexOnce();
+        renderQBank(false);
+      }
     }
 
     // Export / Import Backup
@@ -1779,13 +2009,170 @@
         try {
           const parsed = JSON.parse(e.target.result);
           if (parsed && typeof parsed === "object") {
-            state = { weeks: parsed.weeks || {}, logs: parsed.logs || {}, bufferUsed: parsed.bufferUsed || 0 };
+            state = {
+              weeks: parsed.weeks || {},
+              logs: parsed.logs || {},
+              bufferUsed: parsed.bufferUsed || 0,
+              starred: parsed.starred || {},
+              chMode: parsed.chMode || "all",
+              chOverrides: parsed.chOverrides || {}
+            };
             saveState();
             renderAll();
-            showToast("✅ 备份导入成功", "全部打卡记录与进度已恢复。");
+            renderQBank(false);
+            showToast("✅ 备份导入成功", "全部打卡记录与收藏错题已恢复。");
           }
         } catch (err) {
           alert("备份文件格式无效");
+        }
+      };
+      reader.readAsText(file);
+      event.target.value = "";
+    }
+
+    // ===== Question Bank & Progressive Hint System =====
+    let qbLimit = 25;
+
+    function escHtml(s) {
+      return String(s || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function getQBank() {
+      return Array.isArray(window.QUESTION_BANK) ? window.QUESTION_BANK : [];
+    }
+
+    function renderQBank(resetLimit = true) {
+      if (resetLimit) qbLimit = 25;
+      const bank = getQBank();
+      const listEl = document.getElementById("qb-list");
+      const statsEl = document.getElementById("qb-stats");
+      const moreBtn = document.getElementById("qb-more-btn");
+      if (!listEl) return;
+
+      if (bank.length === 0) {
+        statsEl.textContent = "未检测到 question_bank.js";
+        moreBtn.style.display = "none";
+        listEl.innerHTML = `
+          <div class="callout" style="margin-top:4px;">
+            <strong>尚未生成电子题库：</strong><br>
+            1. 在电脑打开 <code>D:\\Python\\postgraduate-hjw\\advanced-math\\V1</code>，先运行测试命令：<br>
+            <code>$env:OPENAI_API_KEY="sk-你的密钥"</code><br>
+            <code>python build_question_bank.py --test</code><br>
+            2. 生成的 <code>question_bank.js</code> 与本 <code>index.html</code> 放同一目录（或一起推送到 GitHub Pages），刷新本页即自动加载！也可点右上角手动导入 <code>question_bank.json</code>。
+          </div>`;
+        return;
+      }
+
+      const ch = document.getElementById("qb-chapter").value;
+      const kw = (document.getElementById("qb-search").value || "").trim().toLowerCase();
+      const onlyKey = document.getElementById("qb-only-key").checked;
+      const onlyStar = document.getElementById("qb-only-star").checked;
+
+      const filtered = bank.filter(q => {
+        if (ch !== "all" && q.chapter !== ch) return false;
+        if (onlyKey && !q.is_key) return false;
+        if (onlyStar && !state.starred[q.id]) return false;
+        if (kw) {
+          const hay = `${q.chapter_name} ${q.section} 第${q.number}题 p${q.book_page} ${q.topic} ${q.question_md}`.toLowerCase();
+          if (!hay.includes(kw)) return false;
+        }
+        return true;
+      });
+
+      const starTotal = Object.keys(state.starred).length;
+      statsEl.textContent = `题库共 ${bank.length} 题 · 当前匹配 ${filtered.length} 题 · 已收藏错题 ${starTotal} 题`;
+
+      if (filtered.length === 0) {
+        listEl.innerHTML = `<div style="text-align:center;color:var(--muted);padding:24px;">没有匹配的题目，请调整筛选条件。</div>`;
+        moreBtn.style.display = "none";
+        return;
+      }
+
+      const slice = filtered.slice(0, qbLimit);
+      listEl.innerHTML = slice.map(q => {
+        const isStar = !!state.starred[q.id];
+        return `
+          <div class="qb-card ${isStar ? "is-starred" : ""}" id="qcard-${escHtml(q.id)}">
+            <div class="qb-meta">
+              <span class="tag tag-blue">${escHtml(q.chapter.toUpperCase())} · ${escHtml(q.section)} 第 ${escHtml(q.number)} 题</span>
+              <span class="tag" style="background:#f1f5f9;color:#475569;">书 P${escHtml(q.book_page)}</span>
+              ${q.is_key ? `<span class="tag tag-amber">⭐ 重点题目</span>` : ""}
+              ${q.topic ? `<span class="tag tag-purple">${escHtml(q.topic)}</span>` : ""}
+            </div>
+            <div class="qb-stem">${escHtml(q.question_md)}</div>
+            <div class="qb-actions">
+              <button class="qb-btn" onclick="toggleQBox('${escHtml(q.id)}', 'hint', this)">💡 第一步提示</button>
+              <button class="qb-btn" onclick="toggleQBox('${escHtml(q.id)}', 'formula', this)">📌 公式与避坑</button>
+              <button class="qb-btn" onclick="toggleQBox('${escHtml(q.id)}', 'ans', this)">✅ 对最终答案</button>
+              <button class="qb-btn ${isStar ? "star-on" : ""}" onclick="toggleStarQ('${escHtml(q.id)}')">${isStar ? "🔖 已收错题" : "🔖 标为错题"}</button>
+            </div>
+            <div class="qb-box hint" id="qbox-${escHtml(q.id)}-hint"><strong>💡 第一步切入提示：</strong>${escHtml(q.hint_step1 || "暂无")}</div>
+            <div class="qb-box formula" id="qbox-${escHtml(q.id)}-formula">
+              <div><strong>📌 核心公式/定理：</strong>${escHtml(q.key_formula || "暂无")}</div>
+              <div style="margin-top:4px;"><strong>⚠️ 易错避坑：</strong>${escHtml(q.pitfall || "暂无")}</div>
+            </div>
+            <div class="qb-box ans" id="qbox-${escHtml(q.id)}-ans"><strong>✅ 参考答案：</strong>${escHtml(q.final_answer || "暂无")}</div>
+          </div>
+        `;
+      }).join("");
+
+      if (filtered.length > qbLimit) {
+        moreBtn.style.display = "inline-block";
+        moreBtn.textContent = `加载更多（剩余 ${filtered.length - qbLimit} 题）`;
+      } else {
+        moreBtn.style.display = "none";
+      }
+
+      if (typeof renderMathInElement === "function") {
+        renderMathInElement(listEl, {
+          delimiters: [
+            { left: "$$", right: "$$", display: true },
+            { left: "$", right: "$", display: false }
+          ],
+          throwOnError: false
+        });
+      }
+    }
+
+    function loadMoreQBank() {
+      qbLimit += 25;
+      renderQBank(false);
+    }
+
+    function toggleQBox(id, kind, btn) {
+      const box = document.getElementById(`qbox-${id}-${kind}`);
+      if (!box) return;
+      const shown = box.classList.toggle("show");
+      btn.classList.toggle("active", shown);
+    }
+
+    function toggleStarQ(id) {
+      if (state.starred[id]) delete state.starred[id];
+      else state.starred[id] = true;
+      saveState();
+      renderQBank(false);
+    }
+
+    function importQBankJson(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        try {
+          const parsed = JSON.parse(e.target.result);
+          if (Array.isArray(parsed)) {
+            window.QUESTION_BANK = parsed;
+            renderQBank(true);
+            showToast("📚 题库加载成功", `已载入 ${parsed.length} 道题目！`);
+          } else {
+            alert("JSON 格式应为题目数组");
+          }
+        } catch (err) {
+          alert("无法解析 JSON 文件");
         }
       };
       reader.readAsText(file);
@@ -1796,6 +2183,14 @@
     document.getElementById("log-date").value = todayStr();
     updateQuotaPreview();
     renderAll();
+    renderQBank(true);
+
+    // 注册离线优先 Service Worker（联网打开过 1 次后，4G 无代理/离线也能秒开）
+    if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./sw.js").catch(() => {});
+      });
+    }
   </script>
 </body>
 </html>
