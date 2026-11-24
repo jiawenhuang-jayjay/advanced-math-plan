@@ -11,11 +11,18 @@ const { emptyProgress, mergeProgress } = runInNewContext(src + "\n;({emptyProgre
 const fail = () => assert.fail("unexpected conflict");
 const log = { mode: "1a_normal", chapter: "ch2", newQ: 8, wrongQ: 0, hours: 2.5, note: "" };
 
-test("ordinary 1A day reaches the over-target tier at 8 new questions", () => {
+test("daily tiers use the selected mode's question type and thresholds", () => {
   const html = readFileSync(new URL("../V1/index.html", import.meta.url), "utf8");
   const modes = html.slice(html.indexOf("const MODES ="), html.indexOf("const CHAPTERS ="));
   const scoring = html.slice(html.indexOf("function evalLog("), html.indexOf("function computeStats("));
   const evaluate = runInNewContext(modes + scoring + "evalLog");
+  const below = evaluate({ ...log, newQ: 3 });
+  assert.equal(below.tier, "none");
+  assert.match(below.label, /3\/5 新题/);
+  assert.equal(evaluate({ ...log, newQ: 5 }).tier, "base");
+  assert.equal(evaluate({ ...log, mode: "1a_fri", newQ: 3 }).tier, "base");
+  assert.equal(evaluate({ ...log, mode: "1b_1h", newQ: 3 }).tier, "base");
+  assert.equal(evaluate({ ...log, mode: "1b_half", wrongQ: 3 }).tier, "base");
   assert.equal(evaluate({ ...log, newQ: 7 }).tier, "should");
   assert.equal(evaluate(log).tier, "over");
   assert.equal(evaluate(log).excess, 1);
