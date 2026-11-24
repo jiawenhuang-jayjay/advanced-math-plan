@@ -1,9 +1,10 @@
 const CACHE_PREFIX = "gaoshu-plan-";
-const CACHE_NAME = CACHE_PREFIX + "v3";
+const CACHE_NAME = CACHE_PREFIX + "v4";
 const START_URL = new URL("./", self.location.href);
 const LEGACY_START_URL = new URL("index.html", START_URL);
 const CORE_ASSETS = [
   START_URL.href,
+  "./progress.js",
   "./apple-touch-icon.png",
   "./manifest.json"
 ];
@@ -30,6 +31,7 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   const { request } = event;
   const url = new URL(request.url);
+  if (url.pathname === "/api/progress") return;
   if (request.method !== "GET" || url.origin !== START_URL.origin) return;
 
   const isNavigation = request.mode === "navigate";
