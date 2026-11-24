@@ -25,6 +25,14 @@ function mergeProgress(base, local, remote, resolve) {
   return result;
 }
 
+function chooseProgressVersion(key, here, there, source) {
+  const describe = value => value == null ? "已删除" : JSON.stringify(value);
+  const choice = prompt(`${key} 的记录有冲突。输入 1 保留本机，2 保留${source}，或取消。\n本机：${describe(here)}\n${source}：${describe(there)}`);
+  if (choice === "1") return here;
+  if (choice === "2") return there;
+  throw new DOMException("记录冲突，点击选择", "AbortError");
+}
+
 const syncButton = () => document.getElementById("sync-button");
 let syncing = false;
 function persistProgress() {
@@ -66,6 +74,9 @@ async function syncProgress(manual = false) {
     for (let attempt = 0; attempt < 4; attempt++) {
       const response = await fetch(endpoint, { headers, cache: "no-store" });
       if (!response.ok) throw new Error("云端暂不可用");
+      if (!response.headers.get("Content-Type")?.includes("application/json")) {
+        throw new Error("当前网址未提供同步接口，请从正式站点打开");
+      }
       const cloud = await response.json();
       if (!Number.isInteger(cloud.revision)) throw new Error("云端接口尚未就绪");
       if (pairing !== session) return;
@@ -73,10 +84,7 @@ async function syncProgress(manual = false) {
       const remote = cloud.state || emptyProgress();
       const merged = mergeProgress(session.base, local, remote, (key, here, there) => {
         if (!manual) throw new Error("记录冲突，点击选择");
-        const describe = v => v == null ? "已删除" : JSON.stringify(v);
-        const choice = prompt(key + " 的记录有冲突。输入 1 保留本机，2 保留云端，取消可稍后处理。\n本机：" + describe(here) + "\n云端：" + describe(there));
-        if (choice !== "1" && choice !== "2") throw new Error("记录冲突，点击选择");
-        return choice === "1" ? here : there;
+        return chooseProgressVersion(key, here, there, "云端");
       });
       if (!same(merged, remote)) {
         const put = await fetch(endpoint, {
@@ -85,6 +93,10 @@ async function syncProgress(manual = false) {
         });
         if (put.status === 409) continue;
         if (!put.ok) throw new Error(put.status === 400 ? "记录格式有误" : put.status === 413 ? "进度超出容量" : "上传失败");
+        if (!put.headers.get("Content-Type")?.includes("application/json") ||
+            (await put.json())?.revision !== cloud.revision + 1) {
+          throw new Error("云端未确认写入，进度待同步");
+        }
       }
       if (pairing !== session) return;
       const next = mergeProgress(local, state, merged, (_, here) => here);

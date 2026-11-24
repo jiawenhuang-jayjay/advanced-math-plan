@@ -1,5 +1,5 @@
 const CACHE_PREFIX = "gaoshu-plan-";
-const CACHE_NAME = CACHE_PREFIX + "v4";
+const CACHE_NAME = CACHE_PREFIX + "v5";
 const START_URL = new URL("./", self.location.href);
 const LEGACY_START_URL = new URL("index.html", START_URL);
 const CORE_ASSETS = [
