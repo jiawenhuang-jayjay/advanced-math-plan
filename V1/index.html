@@ -344,10 +344,10 @@
       transition: transform 0.1s;
     }
     .hm-cell:hover { transform: scale(1.25); outline: 1px solid #0f172a; }
+    .hm-cell.t-none { background: var(--red); }
     .hm-cell.t-base { background: #86efac; }
     .hm-cell.t-should { background: #10b981; }
-    .hm-cell.t-over { background: #f4511e; box-shadow: 0 0 4px #f4511e80; }
-    .tag-over { background: #ffedd5; color: #b93812; }
+    .hm-cell.t-over { background: var(--gold); }
     .hm-cell.t-shield { background: #93c5fd; }
     .hm-cell.is-today { outline: 2px solid #2563eb; }
     .hm-legend {
@@ -826,9 +826,10 @@
         <div class="hm-legend">
           <span>图例：</span>
           <span><i class="hm-dot" style="background:#e5eaf2"></i>未记录</span>
+          <span><i class="hm-dot" style="background:var(--red)"></i>未达保底</span>
           <span><i class="hm-dot" style="background:#86efac"></i>🟢 达保底（不断签）</span>
           <span><i class="hm-dot" style="background:#10b981"></i>🔵 达应该（按期推进）</span>
-          <span><i class="hm-dot" style="background:#f4511e"></i>🔥 超额暴击（攒余量）</span>
+          <span><i class="hm-dot" style="background:var(--gold)"></i>🏅 超额暴击（攒余量）</span>
           <span><i class="hm-dot" style="background:#93c5fd"></i>🛡️ 余量保签日</span>
         </div>
       </div>
@@ -897,7 +898,7 @@
                 <th>日期类型</th>
                 <th>🟢 保底 *(不断签)*</th>
                 <th>🔵 应该 *(按期线)*</th>
-                <th>🔥 超额 *(攒余量)*</th>
+                <th>🏅 超额 *(攒余量)*</th>
                 <th>折算周产能</th>
               </tr>
             </thead>
@@ -1015,7 +1016,7 @@
                 <th>日期类型</th>
                 <th>🟢 保底</th>
                 <th>🔵 应该</th>
-                <th>🔥 超额</th>
+                <th>🏅 超额</th>
               </tr>
             </thead>
             <tbody>
@@ -1501,9 +1502,9 @@
       }
       const cfg = MODES[log.mode] || MODES["1a_normal"];
       const val = cfg.metric === "new" ? log.newQ : (cfg.metric === "wrong" ? log.wrongQ : (log.newQ + log.wrongQ));
-      let tier = "none", label = "⚪ 未达保底", bonus = 0, excess = 0;
+      let tier = "none", label = `🔴 未达保底（${Number(val)}/${cfg.base} ${cfg.unit}）`, bonus = 0, excess = 0;
       if (val >= cfg.over) {
-        tier = "over"; label = "🔥 超额暴击"; bonus = 20; excess = Math.max(0, val - cfg.should);
+        tier = "over"; label = "🏅 超额暴击"; bonus = 20; excess = Math.max(0, val - cfg.should);
       } else if (val >= cfg.should) {
         tier = "should"; label = "🔵 标准达成"; bonus = 0; excess = Math.max(0, val - cfg.should);
       } else if (val >= cfg.base) {
@@ -1676,7 +1677,7 @@
         const log = state.logs[ds];
         if (log) {
           const res = evalLog(log);
-          if (res.tier !== "none") cell.classList.add("t-" + res.tier);
+          cell.classList.add("t-" + res.tier);
           cell.title = `${ds} | ${res.label}\n新题：${log.newQ} | 错题：${log.wrongQ} | 时长：${log.hours}h${log.note ? "\n备注：" + log.note : ""}`;
         } else {
           cell.title = `${ds} | 未记录（点击补录）`;
@@ -1803,7 +1804,7 @@
         const modeName = log.shield ? "余量保签" : (MODES[log.mode]?.label || log.mode);
         const chName = CHAPTERS.find(c => c.id === log.chapter)?.name || "其他/综合";
         let tagCls = "tag-blue";
-        if (res.tier === "over") tagCls = "tag-over";
+        if (res.tier === "over") tagCls = "tag-amber";
         else if (res.tier === "base" || res.tier === "should") tagCls = "tag-green";
         else if (res.tier === "none") tagCls = "tag-red";
 
@@ -1833,7 +1834,7 @@
         <strong>当前模式标尺（${cfg.label}）：</strong>
         <span class="tag tag-green">🟢 保底：${cfg.base} ${cfg.unit}</span>
         <span class="tag tag-blue">🔵 应该：${cfg.should} ${cfg.unit}</span>
-        <span class="tag tag-over">🔥 超额暴击：${cfg.over}+ ${cfg.unit}（超出「应该」的题数自动存入余量银行）</span>
+        <span class="tag tag-amber">🏅 超额暴击：${cfg.over}+ ${cfg.unit}（超出「应该」的题数自动存入余量银行）</span>
       `;
     }
 
