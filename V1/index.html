@@ -346,7 +346,8 @@
     .hm-cell:hover { transform: scale(1.25); outline: 1px solid #0f172a; }
     .hm-cell.t-base { background: #86efac; }
     .hm-cell.t-should { background: #10b981; }
-    .hm-cell.t-over { background: #f59e0b; box-shadow: 0 0 4px rgba(245, 158, 11, 0.55); }
+    .hm-cell.t-over { background: #f4511e; box-shadow: 0 0 4px #f4511e80; }
+    .tag-over { background: #ffedd5; color: #b93812; }
     .hm-cell.t-shield { background: #93c5fd; }
     .hm-cell.is-today { outline: 2px solid #2563eb; }
     .hm-legend {
@@ -668,6 +669,7 @@
           <p class="hero-sub">复旦大学（学硕）· 408 专业课 · 数学一目标 140+ · 《2026 接力题典 1800·数一》高数基础篇（全章 846 题 = 入门 214 + 基础 632，Ch1 已全通关）</p>
         </div>
         <div class="hero-actions">
+          <button id="sync-button" class="hero-btn" onclick="manageSync()">跨设备同步</button>
           <button class="hero-btn" onclick="exportBackup()">导出 JSON 备份</button>
           <button class="hero-btn" onclick="document.getElementById('import-file').click()">导入备份</button>
           <input type="file" id="import-file" accept=".json" style="display:none" onchange="importBackup(event)" />
@@ -826,7 +828,7 @@
           <span><i class="hm-dot" style="background:#e5eaf2"></i>未记录</span>
           <span><i class="hm-dot" style="background:#86efac"></i>🟢 达保底（不断签）</span>
           <span><i class="hm-dot" style="background:#10b981"></i>🔵 达应该（按期推进）</span>
-          <span><i class="hm-dot" style="background:#f59e0b"></i>🔥 超额暴击（攒余量）</span>
+          <span><i class="hm-dot" style="background:#f4511e"></i>🔥 超额暴击（攒余量）</span>
           <span><i class="hm-dot" style="background:#93c5fd"></i>🛡️ 余量保签日</span>
         </div>
       </div>
@@ -906,7 +908,7 @@
                 <td>普通新题日（Ch1/2/4/5前）</td>
                 <td><strong>5 题</strong></td>
                 <td><strong>7 题</strong></td>
-                <td><strong>9 题+</strong></td>
+                <td><strong>8 题+</strong></td>
                 <td>周一~四 28 + 周五 5<br><strong>周均 ~33 题</strong></td>
               </tr>
               <tr>
@@ -1365,11 +1367,12 @@
   </div>
 
   <script async src="./question_bank.js" onload="if(typeof renderQBank==='function') renderQBank(false);" onerror="window.QUESTION_BANK=window.QUESTION_BANK||[]"></script>
+  <script src="./progress.js"></script>
   <script>
     const STORAGE_KEY = "postgrad_math_v2_state";
 
     const MODES = {
-      "1a_normal":  { label: "1A 普通新题日 (2.5h)",     metric: "new",   base: 5,  should: 7,  over: 9,  unit: "新题" },
+      "1a_normal":  { label: "1A 普通新题日 (2.5h)",     metric: "new",   base: 5,  should: 7,  over: 8,  unit: "新题" },
       "1a_lecture": { label: "1A 听框架日 (2.5h)",       metric: "new",   base: 2,  should: 4,  over: 6,  unit: "新题" },
       "1a_fri":     { label: "1A 周五快刷 (1h)",         metric: "new",   base: 3,  should: 5,  over: 7,  unit: "新题" },
       "1a_sat":     { label: "1A 周六错题日 (1h)",       metric: "wrong", base: 4,  should: 6,  over: 8,  unit: "错题" },
@@ -1450,10 +1453,12 @@
       { id: "W55–56.5", round: "r4", tag: "考前定型", date: "12.06–12.18", task: "停新偏难卷；每日 8:30–10:30 选填+2常规大题热身", load: "13h/周", review: "闭卷默写 11 章公式 + 通览低级失误清单" }
     ];
 
-    let state = { weeks: {}, logs: {}, bufferUsed: 0, starred: {}, chMode: "all", chOverrides: {} };
+    let state = emptyProgress();
+    let pairing = null;
     try {
       const raw = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
       if (raw && typeof raw === "object") {
+        pairing = raw.pairing || null;
         state = {
           weeks: raw.weeks || {},
           logs: raw.logs || {},
@@ -1478,7 +1483,8 @@
     }
 
     function saveState() {
-      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+      persistProgress();
+      if (pairing) syncProgress();
     }
 
     function todayStr() {
@@ -1797,7 +1803,7 @@
         const modeName = log.shield ? "余量保签" : (MODES[log.mode]?.label || log.mode);
         const chName = CHAPTERS.find(c => c.id === log.chapter)?.name || "其他/综合";
         let tagCls = "tag-blue";
-        if (res.tier === "over") tagCls = "tag-amber";
+        if (res.tier === "over") tagCls = "tag-over";
         else if (res.tier === "base" || res.tier === "should") tagCls = "tag-green";
         else if (res.tier === "none") tagCls = "tag-red";
 
@@ -1805,11 +1811,11 @@
         tr.innerHTML = `
           <td><strong>${date}</strong></td>
           <td><span class="tag ${tagCls}">${res.label}</span></td>
-          <td>${modeName}<br><span style="font-size:11px;color:var(--muted);">${chName}</span></td>
+          <td>${escHtml(modeName)}<br><span style="font-size:11px;color:var(--muted);">${chName}</span></td>
           <td>新 ${log.newQ} / 错 ${log.wrongQ}</td>
           <td>${log.hours}h</td>
           <td>+${res.xp} XP${res.excess > 0 ? ` · <span style="color:var(--amber);font-weight:700;">+${res.excess} 余量</span>` : ""}</td>
-          <td style="color:var(--muted);">${log.note || "—"}</td>
+          <td style="color:var(--muted);">${escHtml(log.note || "—")}</td>
           <td>
             <button class="btn-outline" style="padding:3px 7px;" onclick="loadDayIntoForm('${date}')">编辑</button>
             <button class="btn-outline" style="padding:3px 7px;color:var(--red);" onclick="deleteLog('${date}')">删</button>
@@ -1827,7 +1833,7 @@
         <strong>当前模式标尺（${cfg.label}）：</strong>
         <span class="tag tag-green">🟢 保底：${cfg.base} ${cfg.unit}</span>
         <span class="tag tag-blue">🔵 应该：${cfg.should} ${cfg.unit}</span>
-        <span class="tag tag-amber">🔥 超额暴击：${cfg.over}+ ${cfg.unit}（超出「应该」的题数自动存入余量银行）</span>
+        <span class="tag tag-over">🔥 超额暴击：${cfg.over}+ ${cfg.unit}（超出「应该」的题数自动存入余量银行）</span>
       `;
     }
 
@@ -2184,6 +2190,21 @@
     updateQuotaPreview();
     renderAll();
     renderQBank(true);
+
+    syncProgress();
+    window.addEventListener("online", () => syncProgress());
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden) syncProgress();
+    });
+    setInterval(() => { if (!document.hidden) syncProgress(); }, 30000);
+    window.addEventListener("storage", event => {
+      if (event.key !== STORAGE_KEY || !event.newValue) return;
+      const { pairing: savedPairing, ...savedState } = JSON.parse(localStorage.getItem(STORAGE_KEY));
+      pairing = savedPairing || null;
+      state = savedState;
+      renderAll();
+      renderQBank(false);
+    });
 
     // 注册离线优先 Service Worker（联网打开过 1 次后，4G 无代理/离线也能秒开）
     if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {

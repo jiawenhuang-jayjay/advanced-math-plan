@@ -1,7 +1,14 @@
 {
   "name": "advanced-math-plan",
   "compatibility_date": "2026-11-22",
+  "main": "worker.mjs",
+  "durable_objects": {
+    "bindings": [{ "name": "PROGRESS", "class_name": "Progress" }]
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Progress"] }],
   "assets": {
-    "directory": "./V1"
+    "directory": "./V1",
+    "binding": "ASSETS",
+    "run_worker_first": ["/api/progress"]
   }
 }
