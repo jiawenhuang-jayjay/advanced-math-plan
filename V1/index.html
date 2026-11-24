@@ -2015,7 +2015,7 @@
         try {
           const parsed = JSON.parse(e.target.result);
           if (parsed && typeof parsed === "object") {
-            state = {
+            const backup = {
               weeks: parsed.weeks || {},
               logs: parsed.logs || {},
               bufferUsed: parsed.bufferUsed || 0,
@@ -2023,13 +2023,21 @@
               chMode: parsed.chMode || "all",
               chOverrides: parsed.chOverrides || {}
             };
+            let action = "1";
+            if (!same(state, emptyProgress())) {
+              action = prompt("输入 1 合并备份并保留两边记录，或输入 2 用备份替换现有记录。" +
+                (pairing ? "结果会同步到已配对设备。" : ""), "1");
+              if (action !== "1" && action !== "2") return;
+            }
+            state = action === "2" ? backup : mergeProgress(emptyProgress(), state, backup,
+              (key, here, there) => chooseProgressVersion(key, here, there, "备份"));
             saveState();
             renderAll();
             renderQBank(false);
             showToast("✅ 备份导入成功", "全部打卡记录与收藏错题已恢复。");
           }
         } catch (err) {
-          alert("备份文件格式无效");
+          if (err.name !== "AbortError") alert("备份文件格式无效");
         }
       };
       reader.readAsText(file);
