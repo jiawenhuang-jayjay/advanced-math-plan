@@ -339,16 +339,16 @@
       width: 13px;
       height: 13px;
       border-radius: 3px;
-      background: #e5eaf2;
+      background: var(--hm-empty);
       cursor: pointer;
       transition: transform 0.1s;
     }
     .hm-cell:hover { transform: scale(1.25); outline: 1px solid #0f172a; }
-    .hm-cell.t-none { background: var(--red); }
-    .hm-cell.t-base { background: #86efac; }
-    .hm-cell.t-should { background: #10b981; }
-    .hm-cell.t-over { background: var(--gold); }
-    .hm-cell.t-shield { background: #93c5fd; }
+    .hm-cell.t-none { background: var(--hm-none); }
+    .hm-cell.t-base { background: var(--hm-base); }
+    .hm-cell.t-should { background: var(--hm-should); }
+    .hm-cell.t-over { background: var(--hm-over); }
+    .hm-cell.t-shield { background: var(--hm-shield); }
     .hm-cell.is-today { outline: 2px solid #2563eb; }
     .hm-legend {
       display: flex;
@@ -359,13 +359,20 @@
       color: var(--muted);
       margin-top: 10px;
     }
-    .hm-dot {
-      display: inline-block;
-      width: 12px;
-      height: 12px;
-      border-radius: 3px;
-      vertical-align: middle;
-      margin-right: 4px;
+    .hm-legend label {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      min-height: 32px;
+      cursor: pointer;
+    }
+    .hm-legend input[type="color"] {
+      width: 26px;
+      height: 26px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      cursor: pointer;
     }
 
     /* Chapter Map */
@@ -824,13 +831,13 @@
           </div>
         </div>
         <div class="hm-legend">
-          <span>图例：</span>
-          <span><i class="hm-dot" style="background:#e5eaf2"></i>未记录</span>
-          <span><i class="hm-dot" style="background:var(--red)"></i>未达保底</span>
-          <span><i class="hm-dot" style="background:#86efac"></i>🟢 达保底（不断签）</span>
-          <span><i class="hm-dot" style="background:#10b981"></i>🔵 达应该（按期推进）</span>
-          <span><i class="hm-dot" style="background:var(--gold)"></i>🏅 超额暴击（攒余量）</span>
-          <span><i class="hm-dot" style="background:#93c5fd"></i>🛡️ 余量保签日</span>
+          <span>图例（点击色块调色）</span>
+          <label><input type="color" name="empty" value="#e5eaf2">未记录</label>
+          <label><input type="color" name="none" value="#dc2626">未达保底</label>
+          <label><input type="color" name="base" value="#86efac">达保底（不断签）</label>
+          <label><input type="color" name="should" value="#10b981">达应该（按期推进）</label>
+          <label><input type="color" name="over" value="#f59e0b">超额暴击（攒余量）</label>
+          <label><input type="color" name="shield" value="#93c5fd">余量保签日</label>
         </div>
       </div>
 
@@ -1638,6 +1645,25 @@
       renderWeeks(document.querySelector(".filter-btn.active")?.getAttribute("data-filter") || "all");
     }
 
+    function initHeatmapColors() {
+      const grid = document.getElementById("hm-grid");
+      for (const picker of document.querySelectorAll('.hm-legend input[type="color"]')) {
+        const key = "postgrad_math_heatmap_" + picker.name;
+        try {
+          const saved = localStorage.getItem(key);
+          if (/^#[0-9a-f]{6}$/i.test(saved)) picker.value = saved;
+        } catch { /* 受限浏览器仍可在当前页面调色。 */ }
+        const apply = () => grid.style.setProperty("--hm-" + picker.name, picker.value);
+        apply();
+        picker.addEventListener("input", apply);
+        picker.addEventListener("change", () => {
+          apply();
+          try { localStorage.setItem(key, picker.value); }
+          catch { showToast("配色已应用到当前页面", "浏览器未能保存，下次打开时会使用原来的配色。"); }
+        });
+      }
+    }
+
     function renderHeatmap() {
       const grid = document.getElementById("hm-grid");
       const monthsBar = document.getElementById("hm-months");
@@ -2195,6 +2221,7 @@
     }
 
     // Init
+    initHeatmapColors();
     document.getElementById("log-date").value = todayStr();
     updateQuotaPreview();
     renderAll();

@@ -28,6 +28,30 @@ test("daily tiers use the selected mode's question type and thresholds", () => {
   assert.equal(evaluate(log).excess, 1);
 });
 
+test("a heatmap color previews immediately and restores on the next visit", () => {
+  const html = readFileSync(new URL("../V1/index.html", import.meta.url), "utf8");
+  const init = html.slice(html.indexOf("function initHeatmapColors("), html.indexOf("function renderHeatmap("));
+  const picker = Object.assign(new EventTarget(), { name: "over", value: "#f59e0b" });
+  const colors = new Map();
+  const prefs = new Map([["postgrad_math_heatmap_over", "invalid"]]);
+  const visit = () => runInNewContext(init + "initHeatmapColors()", {
+    document: {
+      getElementById: () => ({ style: { setProperty: colors.set.bind(colors) } }),
+      querySelectorAll: () => [picker]
+    },
+    localStorage: { getItem: prefs.get.bind(prefs), setItem: prefs.set.bind(prefs) }
+  });
+  visit();
+  assert.equal(colors.get("--hm-over"), "#f59e0b");
+  picker.value = "#785abc";
+  picker.dispatchEvent(new Event("input"));
+  assert.equal(colors.get("--hm-over"), "#785abc");
+  picker.dispatchEvent(new Event("change"));
+  picker.value = "#f59e0b";
+  visit();
+  assert.equal(picker.value, "#785abc");
+});
+
 test("merge offline edits by date, propagate deletion and surface same-day conflicts", () => {
   const base = emptyProgress();
   base.logs["2026-11-22"] = log;
