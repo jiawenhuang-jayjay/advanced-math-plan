@@ -1,5 +1,5 @@
 const CACHE_PREFIX = "gaoshu-plan-";
-const CACHE_NAME = CACHE_PREFIX + "v5";
+const CACHE_NAME = CACHE_PREFIX + "v6";
 const START_URL = new URL("./", self.location.href);
 const LEGACY_START_URL = new URL("index.html", START_URL);
 const CORE_ASSETS = [
@@ -12,7 +12,7 @@ const CORE_ASSETS = [
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(async (cache) => {
-      await cache.addAll(CORE_ASSETS);
+      await cache.addAll(CORE_ASSETS.map(url => new Request(url, { cache: "reload" })));
       await cache.add("./question_bank.js").catch(() => {});
       await self.skipWaiting();
     })
